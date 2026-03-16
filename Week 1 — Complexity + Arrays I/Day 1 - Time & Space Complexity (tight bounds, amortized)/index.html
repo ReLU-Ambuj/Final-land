@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 1: Time & Space Complexity (14-Hour Mastery Session)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Slate & Blue Minimalist (Professional, academic, clean readability) -->
+    <!-- Application Structure Plan: 
+         A persistent side navigation (dashboard layout) allows the student to move fluidly between the 4 
+         learning blocks. The main content area handles heavy reading, interactive problem-solving (toggled 
+         solutions), and a dynamic benchmarking chart. This structure separates theory, massive practice sets 
+         (40+ problems), deeper math, and practical benchmarking into digestible chunks without losing context, 
+         crucial for a marathon 14-hour study session.
+    -->
+    <!-- Visualization & Content Choices: 
+         - Theory: Text blocks with clear headings and inline code. Goal: Build foundational knowledge.
+         - Snippets & Recurrences (50 total): Interactive cards with "Reveal" logic. Goal: Active recall and testing, preventing passive reading.
+         - Empirical Benchmarking: Dynamic line chart using Chart.js. Goal: Build visual intuition of why O(n^2) fails for N=10^5 while O(N log N) passes. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; scroll-behavior: smooth; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 400px; max-height: 500px; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        .nav-active { background-color: #eff6ff; color: #1d4ed8; border-right: 4px solid #1d4ed8; font-weight: 600; }
+        pre { background-color: #0f172a; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        code { font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace; font-size: 0.875rem; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col h-full z-10 shadow-sm">
+        <div class="p-6 border-b border-slate-200">
+            <h1 class="text-xl font-bold text-slate-900 leading-tight">Complexity<br>Mastery</h1>
+            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Day 1 &bull; 14 Hours</p>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4 hide-scroll" id="sidebar-nav">
+            <button onclick="switchTab('block1')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors nav-active" data-target="block1">
+                &#128218; Block 1: Theory
+            </button>
+            <button onclick="switchTab('block2')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block2">
+                &#9881; Block 2: Practice (40)
+            </button>
+            <button onclick="switchTab('block3')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block3">
+                &#129504; Block 3: Hard Analysis
+            </button>
+            <button onclick="switchTab('block4')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block4">
+                &#128200; Block 4: Benchmarks
+            </button>
+        </nav>
+        <div class="p-4 border-t border-slate-200 text-xs text-center text-slate-400">
+            ICPC / Codeforces Prep
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto h-full bg-slate-50 relative pb-20">
+        <div class="max-w-5xl mx-auto px-8 py-12">
+            
+            <!-- BLOCK 1: THEORY -->
+            <section id="block1" class="tab-content block">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900">Block 1: Theory (3 Hours)</h2>
+                    <p class="text-lg text-slate-600 mt-2">The absolute foundations of algorithmic runtime analysis. Build your theoretical intuition.</p>
+                </header>
+
+                <div class="space-y-12">
+                    <!-- Asymptotic Notations -->
+                    <div>
+                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">1. Asymptotic Notations</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                                <h4 class="font-bold text-lg text-slate-900 mb-2">Big O ( O )</h4>
+                                <p class="text-sm text-slate-600 mb-2"><strong>Upper Bound.</strong> "The algorithm grows NO FASTER than this."</p>
+                                <p class="text-xs text-slate-500 mb-4">Formal: f(n) &le; c &middot; g(n) for all n &ge; n&infin;</p>
+                                <div class="bg-blue-50 text-blue-800 p-3 rounded text-sm font-mono">
+                                    O(N^2) covers N, N log N, and N^2.
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                                <h4 class="font-bold text-lg text-slate-900 mb-2">Big &Theta; ( &Theta; )</h4>
+                                <p class="text-sm text-slate-600 mb-2"><strong>Tight Bound.</strong> "The algorithm grows EXACTLY like this."</p>
+                                <p class="text-xs text-slate-500 mb-4">Formal: c1&middot;g(n) &le; f(n) &le; c2&middot;g(n)</p>
+                                <div class="bg-emerald-50 text-emerald-800 p-3 rounded text-sm font-mono">
+                                    &Theta;(N) means strictly linear. No faster, no slower.
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                                <h4 class="font-bold text-lg text-slate-900 mb-2">Big &Omega; ( &Omega; )</h4>
+                                <p class="text-sm text-slate-600 mb-2"><strong>Lower Bound.</strong> "The algorithm takes AT LEAST this long."</p>
+                                <p class="text-xs text-slate-500 mb-4">Formal: f(n) &ge; c &middot; g(n) for all n &ge; n&infin;</p>
+                                <div class="bg-rose-50 text-rose-800 p-3 rounded text-sm font-mono">
+                                    &Omega;(1) means it takes at least 1 operation.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hierarchy -->
+                    <div>
+                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">2. Complexity Growth Hierarchy</h3>
+                        <p class="mb-4 text-slate-700">In competitive programming, 10<sup>8</sup> operations take ~1 second in C++. Understanding the hierarchy is how you reverse-engineer the intended solution from the constraints.</p>
+                        <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-slate-200">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-100 text-slate-700">
+                                    <tr>
+                                        <th class="p-4 border-b">Notation</th>
+                                        <th class="p-4 border-b">Name</th>
+                                        <th class="p-4 border-b">Max 'N' for 1 sec</th>
+                                        <th class="p-4 border-b">Algorithm Example</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b"><td class="p-4 font-mono font-bold">O(1)</td><td class="p-4">Constant</td><td class="p-4">&infin;</td><td class="p-4">Math formulas, Array index lookup</td></tr>
+                                    <tr class="border-b"><td class="p-4 font-mono font-bold">O(log n)</td><td class="p-4">Logarithmic</td><td class="p-4">10<sup>18</sup></td><td class="p-4">Binary Search, GCD</td></tr>
+                                    <tr class="border-b"><td class="p-4 font-mono font-bold">O(&radic;n)</td><td class="p-4">Square Root</td><td class="p-4">10<sup>12</sup></td><td class="p-4">Primality testing, Mo's Algorithm</td></tr>
+                                    <tr class="border-b"><td class="p-4 font-mono font-bold">O(n)</td><td class="p-4">Linear</td><td class="p-4">10<sup>7</sup> - 10<sup>8</sup></td><td class="p-4">Two Pointers, Prefix Sums, KMP</td></tr>
+                                    <tr class="border-b"><td class="p-4 font-mono font-bold">O(n log n)</td><td class="p-4">Linearithmic</td><td class="p-4">2 &times; 10<sup>5</sup></td><td class="p-4">Merge Sort, std::sort, Segment Trees</td></tr>
+                                    <tr class="border-b"><td class="p-4 font-mono font-bold">O(n<sup>2</sup>)</td><td class="p-4">Quadratic</td><td class="p-4">5000</td><td class="p-4">Bubble Sort, 2D Array Traversal</td></tr>
+                                    <tr class="border-b"><td class="p-4 font-mono font-bold">O(n<sup>3</sup>)</td><td class="p-4">Cubic</td><td class="p-4">400</td><td class="p-4">Floyd-Warshall, Matrix Multiplication</td></tr>
+                                    <tr class="border-b"><td class="p-4 font-mono font-bold">O(2<sup>n</sup>)</td><td class="p-4">Exponential</td><td class="p-4">20 - 25</td><td class="p-4">Backtracking, Subset Generation</td></tr>
+                                    <tr><td class="p-4 font-mono font-bold">O(n!)</td><td class="p-4">Factorial</td><td class="p-4">10 - 11</td><td class="p-4">Permutation Generation</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Amortized Complexity -->
+                    <div>
+                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">3. Amortized Complexity</h3>
+                        <p class="mb-4 text-slate-700">Amortized analysis averages the time required to perform a sequence of data-structure operations. Even if a single operation is expensive (like resizing), the <em>average</em> cost over a sequence is low.</p>
+                        
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h4 class="font-bold text-lg mb-2 text-slate-900">Case Study: <code>std::vector::push_back</code></h4>
+                            <p class="text-slate-700 mb-4">When a vector is full, adding an element requires allocating a new array of <strong>double</strong> the capacity, copying old elements, and adding the new one. This specific resize is O(N).</p>
+                            <div class="flex items-center space-x-2 text-sm font-mono bg-slate-100 p-4 rounded mb-4 overflow-x-auto">
+                                <span>Cap: 1</span> <span>&#8594;</span>
+                                <span>Cap: 2</span> <span>&#8594;</span>
+                                <span>Cap: 4</span> <span>&#8594;</span>
+                                <span>Cap: 8</span> <span>&#8594;</span>
+                                <span>Cap: 16</span>
+                            </div>
+                            <p class="text-slate-700">Let's insert N elements. The cost is 1 for each insert, plus the cost of copying during resizes. The copies happen at sizes 1, 2, 4, 8... up to N.<br><br>
+                            Total Copy Cost = 1 + 2 + 4 + 8 + ... + N/2 < N.<br>
+                            Total Overall Cost = N (inserts) + N (copies) = 2N.<br>
+                            Average cost per operation = 2N / N = <strong>O(1) Amortized.</strong></p>
+                        </div>
+                    </div>
+
+                    <!-- Loop Patterns -->
+                    <div>
+                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">4. Loop Analysis Patterns</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-900 text-slate-200 rounded-lg">
+<pre><code>// Simple Loop -> O(n)
+for(int i=0; i&lt;n; i++) { ... }
+
+// Nested Loops -> O(n^2)
+for(int i=0; i&lt;n; i++) {
+    for(int j=0; j&lt;n; j++) { ... }
+}
+
+// Triangular Loops -> O(n^2)
+for(int i=0; i&lt;n; i++) {
+    for(int j=0; j&lt;i; j++) { ... } // Operations = n*(n-1)/2
+}
+
+// Logarithmic Loops -> O(log n)
+for(int i=1; i&lt;n; i*=2) { ... } // i doubles each step
+</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BLOCK 2: PRACTICE (40) -->
+            <section id="block2" class="tab-content hidden">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900">Block 2: Complexity Estimation (40 Problems)</h2>
+                    <p class="text-lg text-slate-600 mt-2">Test your intuition. Analyze the snippets, predict the worst-case Big O time complexity, and check the solution.</p>
+                </header>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-slate-800">Competitive Programming Context</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                            <h4 class="font-bold text-blue-900">Codeforces: Bear and Big Brother</h4>
+                            <p class="text-sm text-blue-800 mt-1">Weights `a`, `b`. `a` triples, `b` doubles each year. When is `a > b`?</p>
+                            <p class="text-xs font-mono bg-blue-100 p-1 mt-2 rounded">Optimal: O(log N) loop</p>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                            <h4 class="font-bold text-blue-900">Codeforces: Team</h4>
+                            <p class="text-sm text-blue-800 mt-1">Read N lines of 3 integers. Count lines with sum &ge; 2.</p>
+                            <p class="text-xs font-mono bg-blue-100 p-1 mt-2 rounded">Optimal: O(N) loop</p>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                            <h4 class="font-bold text-blue-900">Codeforces: Next Round</h4>
+                            <p class="text-sm text-blue-800 mt-1">Given array of N scores, count scores &ge; kth score and > 0.</p>
+                            <p class="text-xs font-mono bg-blue-100 p-1 mt-2 rounded">Optimal: O(N) array scan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="snippet-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Snippets injected by JS -->
+                </div>
+            </section>
+
+            <!-- BLOCK 3: HARD ANALYSIS -->
+            <section id="block3" class="tab-content hidden">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900">Block 3: Harder Analysis (4 Hours)</h2>
+                    <p class="text-lg text-slate-600 mt-2">Harmonic series, nested logs, mixed patterns, and recurrence relations.</p>
+                </header>
+
+                <div class="space-y-12">
+                    <!-- Harmonic & Log Nested -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold border-b pb-2 mb-4 text-slate-800">Harmonic Complexity</h3>
+<pre class="mb-4"><code>for(int i=1; i<=n; i++) {
+    for(int j=1; j<=n; j+=i) {
+        // ...
+    }
+}</code></pre>
+                            <p class="text-slate-700">The inner loop runs <code>n/i</code> times.<br>
+                            Sum = n/1 + n/2 + n/3 + ... + n/n<br>
+                            Sum = n * (1 + 1/2 + 1/3 + ... + 1/n)<br>
+                            The sum of the harmonic series grows logarithmically.<br>
+                            <strong>Total Complexity: O(n log n)</strong>. Extremely common in number theory (Sieve variants).</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold border-b pb-2 mb-4 text-slate-800">Logarithmic Nested Loops</h3>
+<pre class="mb-4"><code>for(int i=1; i&lt;n; i*=2) {
+    for(int j=0; j&lt;i; j++) {
+        // ...
+    }
+}</code></pre>
+                            <p class="text-slate-700">The inner loop bounds depend on <code>i</code>, which doubles: 1, 2, 4, 8...<br>
+                            Operations: 1 + 2 + 4 + 8 + ... + n<br>
+                            This is a geometric series. The sum is 2n - 1.<br>
+                            <strong>Total Complexity: O(n)</strong>. Do not just multiply loop depths!</p>
+                        </div>
+                    </div>
+
+                    <!-- Square Root Loops -->
+                    <div>
+                        <h3 class="text-xl font-bold border-b pb-2 mb-4 text-slate-800">Square Root Loops</h3>
+<pre class="mb-4"><code>for(int i=1; i*i&lt;=n; i++) {
+    // Prime factorization, divisors, etc.
+}</code></pre>
+                        <p class="text-slate-700">The loop terminates when <code>i^2 > n</code>, meaning <code>i > &radic;n</code>. Thus, the loop runs exactly &radic;n times. <strong>Complexity: O(&radic;n)</strong>.</p>
+                    </div>
+
+                    <!-- Recurrence Relations -->
+                    <div>
+                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">Recurrence Intuition (10 Problems)</h3>
+                        <p class="mb-4 text-slate-600">Solve these recurrences. Think about the recursion tree: How many levels? What is the work done at each level?</p>
+                        <div id="recurrence-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Recurrences injected via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BLOCK 4: BENCHMARKS -->
+            <section id="block4" class="tab-content hidden">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900">Block 4: Implement & Experiment (3 Hours)</h2>
+                    <p class="text-lg text-slate-600 mt-2">Write the C++ template, measure execution times, and visualize the explosions.</p>
+                </header>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 text-slate-800">Task 1: The CP Benchmark Template</h3>
+                        <p class="text-sm text-slate-600 mb-2">Always use <code>ios::sync_with_stdio(false)</code>. Use <code>chrono</code> for precision timing.</p>
+<pre class="text-xs"><code>#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;chrono&gt;
+using namespace std;
+using namespace std::chrono;
+
+void solve(int n) {
+    // Your O(n), O(n^2), etc. code here
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    
+    int n = 100000;
+    auto start = high_resolution_clock::now();
+    
+    solve(n);
+    
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast&lt;milliseconds&gt;(stop - start);
+    cout &lt;&lt; "Time: " &lt;&lt; duration.count() &lt;&lt; " ms\n";
+    return 0;
+}</code></pre>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <h3 class="text-xl font-bold mb-4 text-slate-800">Reflection & Checklist</h3>
+                        <ul class="space-y-3 text-slate-700 text-sm">
+                            <li class="flex items-start"><span class="mr-2 text-blue-600 font-bold">&check;</span> <strong>Identify N:</strong> What is the primary input size driving the loop/recursion?</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600 font-bold">&check;</span> <strong>Nested != Multiplication:</strong> Are inner loops dependent on outer loop variables?</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600 font-bold">&check;</span> <strong>Logarithmic Steps:</strong> Are loop variables multiplying or dividing by constants?</li>
+                            <li class="flex items-start"><span class="mr-2 text-blue-600 font-bold">&check;</span> <strong>Worst Case:</strong> What happens if the `break` statement is never hit?</li>
+                            <li class="flex items-start"><span class="mr-2 text-red-600 font-bold">X</span> <strong>Common Mistake:</strong> Assuming string concatenation `s += "a"` is O(1) in all languages. (In C++ `std::string` it is amortized O(1), but `s = s + "a"` is O(N)).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Visual Intuition Chart -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 border-b pb-2 text-slate-800">Visual Intuition: Why Exponential/Quadratic Explodes</h3>
+                    <p class="text-sm text-slate-600 mb-6">Interact with the slider below to see how the theoretical number of operations grows as <strong>N</strong> increases. Watch O(N<sup>2</sup>) shoot off the chart while O(N log N) stays flat.</p>
+                    
+                    <div class="mb-6 bg-white p-4 rounded border border-slate-200 shadow-sm">
+                        <label for="n-slider" class="block text-sm font-bold text-slate-700 mb-2">Adjust N: <span id="n-display" class="text-blue-600">100</span></label>
+                        <input type="range" id="n-slider" min="10" max="1000" value="100" class="w-full cursor-pointer accent-blue-600">
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="chart-container">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            
+        </div>
+    </main>
+
+    <!-- JS Logic -->
+    <script>
+        // --- Navigation Logic ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('nav-active'));
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelector(`[data-target="${tabId}"]`).classList.add('nav-active');
+            
+            if(tabId === 'block4') {
+                updateChart(); // Ensure chart renders properly if tab is opened
+            }
+        }
+
+        // --- Block 2: 40 Snippets Data ---
+        const snippets = [
+            // Simple / Linear (1-5)
+            { code: "for(int i=0; i<n; i++) {\n    a += i;\n}", desc: "Simple iteration", ans: "O(n)" },
+            { code: "for(int i=0; i<n; i+=2) {\n    a += i;\n}", desc: "Iterates n/2 times. Constants are dropped.", ans: "O(n)" },
+            { code: "for(int i=n; i>0; i--) {\n    a += i;\n}", desc: "Reverse iteration. Still runs n times.", ans: "O(n)" },
+            { code: "for(int i=0; i<n; i++) { a++; }\nfor(int j=0; j<n; j++) { b++; }", desc: "Sequential loops. O(n) + O(n) = O(2n) -> O(n).", ans: "O(n)" },
+            { code: "int i = 0;\nwhile(i < n) {\n    i++;\n}", desc: "While loop equivalent to simple for loop.", ans: "O(n)" },
+            
+            // Logarithmic (6-10)
+            { code: "for(int i=1; i<n; i*=2) {\n    a++;\n}", desc: "i doubles every step. Takes log2(n) steps.", ans: "O(log n)" },
+            { code: "for(int i=n; i>1; i/=2) {\n    a++;\n}", desc: "n is halved every step. Takes log2(n) steps.", ans: "O(log n)" },
+            { code: "for(int i=1; i<n; i*=3) {\n    a++;\n}", desc: "Multiplies by 3. Base of log doesn't matter in Big O.", ans: "O(log n)" },
+            { code: "int i = n;\nwhile(i > 0) {\n    i = i / 10;\n}", desc: "Digit extraction loop. Runs log10(n) times.", ans: "O(log n)" },
+            { code: "for(int i=2; i<n; i=i*i) {\n    a++;\n}", desc: "i goes 2, 4, 16, 256. This is O(log(log n)). Very rare, but good to know.", ans: "O(log log n)" },
+            
+            // Quadratic / Cubic (11-15)
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=0; j<n; j++) {\n    a++;\n  }\n}", desc: "Standard nested loops. n * n operations.", ans: "O(n²)" },
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=0; j<m; j++) {\n    a++;\n  }\n}", desc: "Dependent on two variables. Cannot simplify to n² if n != m.", ans: "O(n * m)" },
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=0; j<n; j++) {\n    for(int k=0; k<n; k++) {\n      a++;\n    }\n  }\n}", desc: "Triple nested loop.", ans: "O(n³)" },
+            { code: "for(int i=0; i<n; i+=2) {\n  for(int j=1; j<n; j+=3) {\n    a++;\n  }\n}", desc: "(n/2) * (n/3) operations. Constants are ignored.", ans: "O(n²)" },
+            { code: "for(int i=0; i<n*n; i++) {\n    a++;\n}", desc: "Single loop, but runs n² times.", ans: "O(n²)" },
+
+            // Dependent Loops / Triangular (16-20)
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=0; j<i; j++) {\n    a++;\n  }\n}", desc: "Triangular. 0 + 1 + 2 + ... + (n-1) = n(n-1)/2.", ans: "O(n²)" },
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=i; j<n; j++) {\n    a++;\n  }\n}", desc: "Inverted triangular. Runs n + (n-1) + ... + 1 times.", ans: "O(n²)" },
+            { code: "for(int i=1; i<=n; i++) {\n  for(int j=1; j<=100; j++) {\n    a++;\n  }\n}", desc: "Inner loop is O(1) constant. Overall is n * 100.", ans: "O(n)" },
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=n; j>i; j--) {\n    a++;\n  }\n}", desc: "Another variation of n(n-1)/2.", ans: "O(n²)" },
+            { code: "for(int i=0; i<n; i++) {\n  int j=i;\n  while(j<n && arr[j]!=0) {\n    j++;\n  }\n}", desc: "Worst case: arr has no zeros. Inner loop runs to n from i.", ans: "O(n²)" },
+
+            // Square Root (21-25)
+            { code: "for(int i=1; i*i<=n; i++) {\n    a++;\n}", desc: "Stops when i² > n, which means i > √n.", ans: "O(√n)" },
+            { code: "int i=1;\nwhile(i <= n/i) {\n    i++;\n}", desc: "Equivalent to i² <= n. Runs √n times.", ans: "O(√n)" },
+            { code: "for(int i=0; i<Math.sqrt(n); i++) {\n    a++;\n}", desc: "Explicit square root.", ans: "O(√n)" },
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=1; j*j<=i; j++) {\n    a++;\n  }\n}", desc: "Sum of √i from 1 to n. Integrates to n^(3/2).", ans: "O(n√n)" },
+            { code: "for(int i=0; i*i<n; i+=2) {\n    a++;\n}", desc: "Runs √n / 2 times.", ans: "O(√n)" },
+
+            // Mixed (26-30)
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=1; j<n; j*=2) {\n    a++;\n  }\n}", desc: "Outer is n, inner is log n. Independent.", ans: "O(n log n)" },
+            { code: "for(int i=1; i<n; i*=2) {\n  for(int j=0; j<n; j++) {\n    a++;\n  }\n}", desc: "Outer is log n, inner is n. Independent.", ans: "O(n log n)" },
+            { code: "for(int i=1; i<n; i*=2) {\n  for(int j=1; j<n; j*=2) {\n    a++;\n  }\n}", desc: "Both are logarithmic.", ans: "O(log² n)" },
+            { code: "for(int i=1; i<n; i++) {\n  for(int j=1; j<n; j+=i) {\n    a++;\n  }\n}", desc: "Harmonic series. (n/1 + n/2 + ... + n/n).", ans: "O(n log n)" },
+            { code: "for(int i=1; i<n; i*=2) {\n  for(int j=0; j<i; j++) {\n    a++;\n  }\n}", desc: "Geometric series: 1 + 2 + 4 + ... + n = 2n.", ans: "O(n)" },
+
+            // Break / Continue / Best vs Worst (31-35)
+            { code: "for(int i=0; i<n; i++) {\n  if(arr[i] == target) break;\n}", desc: "Linear search. Worst case target isn't found.", ans: "O(n)" },
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=0; j<n; j++) {\n    if(arr[j] == target) break;\n  }\n}", desc: "Worst case: target not found, runs n*n times.", ans: "O(n²)" },
+            { code: "for(int i=0; i<n; i++) {\n  if(i % 2 == 0) continue;\n  for(int j=0; j<n; j++) { a++; }\n}", desc: "Inner loop runs n/2 times.", ans: "O(n²)" },
+            { code: "int j=0;\nfor(int i=0; i<n; i++) {\n  while(j<n && arr[j]<arr[i]) {\n    j++;\n  }\n}", desc: "Two pointers. `j` only moves forward and maxes at n across ALL `i` iterations.", ans: "O(n)" },
+            { code: "void dfs(int u) {\n  vis[u] = true;\n  for(int v : adj[u]) {\n    if(!vis[v]) dfs(v);\n  }\n}", desc: "Standard DFS on Graph (V vertices, E edges). Each edge checked once.", ans: "O(V + E)" },
+
+            // Tricky / Edge Cases (36-40)
+            { code: "for(int i=0; i<n; i++) {\n  for(int j=i; j<i+100; j++) {\n    a++;\n  }\n}", desc: "Inner loop runs strictly 100 times regardless of n.", ans: "O(n)" },
+            { code: "for(int i=0; i<n; i++) {\n  i += 2;\n}", desc: "i is incremented in loop and in body. Still linear.", ans: "O(n)" },
+            { code: "for(int i=1; i<=n; i++) {\n  for(int j=1; j*j<=i; j++) {\n    if(i%j == 0) a++;\n  }\n}", desc: "Finding divisors for all numbers 1 to n. Sum of √i.", ans: "O(n√n)" },
+            { code: "int count = 0;\nfor(int i=n; i>0; i/=2) {\n  for(int j=0; j<i; j++) {\n    count++;\n  }\n}", desc: "n + n/2 + n/4 + ... + 1 = 2n.", ans: "O(n)" },
+            { code: "for(int i=0; i<(1<<n); i++) {\n  for(int j=0; j<n; j++) {\n    if(i & (1<<j)) a++;\n  }\n}", desc: "Subset generation. Outer is 2^n, inner is n.", ans: "O(n * 2^n)" }
+        ];
+
+        const container = document.getElementById('snippet-container');
+        snippets.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = "bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden flex flex-col";
+            card.innerHTML = `
+                <div class="bg-slate-900 text-slate-200 p-4 text-sm overflow-x-auto flex-1 font-mono leading-relaxed">
+                    <pre><code>${item.code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
+                </div>
+                <div class="p-4 bg-slate-50 border-t border-slate-200">
+                    <button onclick="toggleAnswer('ans-${index}')" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors w-full text-left flex justify-between items-center">
+                        Problem ${index + 1} <span class="text-xs bg-blue-100 px-2 py-1 rounded text-blue-800">Reveal</span>
+                    </button>
+                    <div id="ans-${index}" class="hidden mt-3 pt-3 border-t border-slate-200">
+                        <p class="text-xs text-slate-600 mb-2">${item.desc}</p>
+                        <p class="text-lg font-bold text-emerald-600 font-mono">${item.ans}</p>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // --- Block 3: Recurrences Data ---
+        const recurrences = [
+            { rel: "T(n) = T(n-1) + 1", ans: "O(n)", desc: "1 operation n times (e.g., standard recursion)." },
+            { rel: "T(n) = T(n-1) + n", ans: "O(n²)", desc: "n + (n-1) + ... + 1 (e.g., recursive bubble sort)." },
+            { rel: "T(n) = T(n/2) + 1", ans: "O(log n)", desc: "Halves input, O(1) work (e.g., Binary Search)." },
+            { rel: "T(n) = 2T(n/2) + 1", ans: "O(n)", desc: "Tree with n leaves, constant work per node." },
+            { rel: "T(n) = 2T(n/2) + n", ans: "O(n log n)", desc: "Halves input, branches twice, linear work (e.g., Merge Sort)." },
+            { rel: "T(n) = 3T(n/2) + n", ans: "O(n^(log₂3))", desc: "Master Theorem Case 1. More leaves than work." },
+            { rel: "T(n) = T(n/2) + n", ans: "O(n)", desc: "n + n/2 + n/4... = 2n." },
+            { rel: "T(n) = 4T(n/2) + n²", ans: "O(n² log n)", desc: "Master Theorem Case 2. Work matches leaves." },
+            { rel: "T(n) = T(n/3) + T(2n/3) + n", ans: "O(n log n)", desc: "Unbalanced partition, but tree depth is log n." },
+            { rel: "T(n) = T(√n) + 1", ans: "O(log log n)", desc: "Square root recursion." }
+        ];
+
+        const recContainer = document.getElementById('recurrence-container');
+        recurrences.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = "bg-white border border-slate-200 rounded p-4 shadow-sm";
+            card.innerHTML = `
+                <div class="font-mono font-bold text-slate-800 mb-2">${item.rel}</div>
+                <button onclick="toggleAnswer('rec-${index}')" class="text-xs font-semibold text-blue-600 hover:underline">Reveal Answer</button>
+                <div id="rec-${index}" class="hidden mt-2 pt-2 border-t border-slate-100">
+                    <span class="font-mono text-emerald-600 font-bold">${item.ans}</span>
+                    <p class="text-xs text-slate-500 mt-1">${item.desc}</p>
+                </div>
+            `;
+            recContainer.appendChild(card);
+        });
+
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // --- Block 4: Chart.js Logic ---
+        let growthChart;
+        function initChart() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [], // N values
+                    datasets: [
+                        {
+                            label: 'O(N)',
+                            data: [],
+                            borderColor: '#10b981', // Emerald 500
+                            tension: 0.1,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'O(N log N)',
+                            data: [],
+                            borderColor: '#3b82f6', // Blue 500
+                            tension: 0.1,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'O(N²)',
+                            data: [],
+                            borderColor: '#ef4444', // Red 500
+                            tension: 0.1,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Input Size (N)' }
+                        },
+                        y: {
+                            type: 'logarithmic',
+                            title: { display: true, text: 'Operations (Log Scale)' },
+                            min: 1
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        // Wrap long numbers
+                                        label += context.parsed.y.toExponential(2);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            updateChart();
+        }
+
+        function updateChart() {
+            if(!growthChart) return;
+            const maxN = parseInt(document.getElementById('n-slider').value);
+            document.getElementById('n-display').innerText = maxN;
+
+            const labels = [];
+            const dataN = [];
+            const dataNLogN = [];
+            const dataN2 = [];
+
+            // Generate 50 points up to maxN
+            const step = Math.max(1, Math.floor(maxN / 50));
+            for(let i = step; i <= maxN; i += step) {
+                labels.push(i);
+                dataN.push(i);
+                dataNLogN.push(i * Math.log2(i));
+                dataN2.push(i * i);
+            }
+
+            growthChart.data.labels = labels;
+            growthChart.data.datasets[0].data = dataN;
+            growthChart.data.datasets[1].data = dataNLogN;
+            growthChart.data.datasets[2].data = dataN2;
+            growthChart.update();
+        }
+
+        document.getElementById('n-slider').addEventListener('input', updateChart);
+
+        // Initialize on load
+        window.onload = function() {
+            initChart();
+        };
+
+    </script>
+</body>
+</html>

@@ -124,7 +124,7 @@
                         Answer range queries in <strong class="bg-indigo-800 text-white px-2 py-0.5 rounded font-mono shadow-inner text-xl">O(1)</strong> time complexity after an <strong class="font-mono text-indigo-200">O(n)</strong> preprocessing step.
                     </p>
                     <p class="text-sm text-indigo-200 border-t border-indigo-500 pt-3">
-                        Master the transition from sliding windows to <span class="font-bold text-white">HashSet state-tracking</span> for $O(N)$ subarray discovery.
+                        Master the transition from sliding windows to <span class="font-bold text-white">HashSet state-tracking</span> for <i class="font-serif">O(N)</i> subarray discovery.
                     </p>
                 </section>
 
@@ -301,7 +301,7 @@
                                 <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('b1', 2)">
                                 <div>
                                     <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">1. Range Sum Query - Immutable</span>
-                                    <p class="problem-desc text-sm text-slate-500 mt-1">Implement the `NumArray` class with an $O(1)$ `sumRange` method.</p>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Implement the <code>NumArray</code> class with an <i class="font-serif">O(1)</i> <code>sumRange</code> method.</p>
                                 </div>
                             </label>
 
@@ -309,7 +309,7 @@
                                 <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('b2', 2)">
                                 <div>
                                     <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">2. Running Sum of 1D Array</span>
-                                    <p class="problem-desc text-sm text-slate-500 mt-1">Calculate the $S[i] = S[i-1] + a[i]$ running sum in-place.</p>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Calculate the <code class="bg-slate-100 px-1 rounded text-slate-700 font-mono">S[i] = S[i-1] + a[i]</code> running sum in-place.</p>
                                 </div>
                             </label>
 
@@ -325,7 +325,7 @@
                                 <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('b4', 2)">
                                 <div>
                                     <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">4. Find Pivot Index</span>
-                                    <p class="problem-desc text-sm text-slate-500 mt-1">Find the equilibrium index where `left_sum == right_sum`. Done in $O(n)$ time using `total_sum` subtraction.</p>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Find the equilibrium index where <code>left_sum == right_sum</code>. Done in <i class="font-serif">O(n)</i> time using <code>total_sum</code> subtraction.</p>
                                 </div>
                             </label>
                         </div>
@@ -364,7 +364,7 @@
                                 <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('i1', 3)">
                                 <div>
                                     <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">5. Continuous Subarray Sum</span>
-                                    <p class="problem-desc text-sm text-slate-500 mt-1">Math twist: Track `prefix % K` in the map. If the same modulo is seen $\ge 2$ indices apart, a multiple-of-K subarray exists.</p>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Math twist: Track <code>prefix % K</code> in the map. If the same modulo is seen &ge; 2 indices apart, a multiple-of-K subarray exists.</p>
                                 </div>
                             </label>
 
@@ -372,7 +372,7 @@
                                 <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('i2', 3)">
                                 <div>
                                     <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">6. Maximum Size Subarray Sum Equals K</span>
-                                    <p class="problem-desc text-sm text-slate-500 mt-1">Instead of counting frequencies, store the <strong>earliest index</strong> a sum was seen to maximize $(i - j)$.</p>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Instead of counting frequencies, store the <strong>earliest index</strong> a sum was seen to maximize <i class="font-serif">(i - j)</i>.</p>
                                 </div>
                             </label>
 
@@ -388,7 +388,7 @@
                                 <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('i4', 3)">
                                 <div>
                                     <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">8. Binary Subarrays With Sum</span>
-                                    <p class="problem-desc text-sm text-slate-500 mt-1">Can be solved with Prefix Map, or the $O(1)$ space `AtMost(K) - AtMost(K-1)` sliding window trick.</p>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Can be solved with Prefix Map, or the <i class="font-serif">O(1)</i> space <code>AtMost(K) - AtMost(K-1)</code> sliding window trick.</p>
                                 </div>
                             </label>
                         </div>
@@ -415,7 +415,7 @@
                                 <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('h1', 4)">
                                 <div>
                                     <span class="task-text font-bold text-slate-700 group-hover:text-rose-700 block">9. Number of Submatrices that Sum to Target</span>
-                                    <p class="problem-desc text-sm text-slate-500 mt-1">Fix $R1$ and $R2$, compressing the 2D height into a 1D column-sum row. Apply the `Subarray Sum K` Hash Map logic from Problem 3. Drops $O(R^2 C^2) \rightarrow O(R^2 C)$.</p>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Fix <i class="font-serif">R1</i> and <i class="font-serif">R2</i>, compressing the 2D height into a 1D column-sum row. Apply the <code>Subarray Sum K</code> Hash Map logic from Problem 3. Drops <span class="whitespace-nowrap font-serif italic text-slate-700 bg-slate-100 px-1 rounded">O(R<sup>2</sup> C<sup>2</sup>) &rarr; O(R<sup>2</sup> C)</span>.</p>
                                 </div>
                             </label>
                             
@@ -423,7 +423,7 @@
                                 <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('h2', 4)">
                                 <div>
                                     <span class="task-text font-bold text-slate-700 group-hover:text-rose-700 block">10. Maximum Average Subarray II</span>
-                                    <p class="problem-desc text-sm text-slate-500 mt-1">Binary search the result average. Subtract average candidate $C$ from all items: condition becomes finding a subarray $\ge$ length K where $Sum(a_i - C) \ge 0$.</p>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Binary search the result average. Subtract average candidate <i class="font-serif">C</i> from all items: condition becomes finding a subarray &ge; length K where <code class="bg-slate-100 px-1 rounded text-slate-700 font-mono">Sum(a<sub>i</sub> - C) &ge; 0</code>.</p>
                                 </div>
                             </label>
                         </div>
@@ -448,7 +448,7 @@
                         <div class="text-3xl">🧮</div>
                         <div>
                             <div class="text-xs font-bold text-violet-800 uppercase tracking-widest mb-1">The Dual Operation</div>
-                            <p class="text-sm text-violet-900 font-medium">For $O(1)$ static range updates $[L, R] += V$, apply: <code class="bg-white px-2 py-0.5 rounded shadow-sm border border-violet-200">D[L] += V; D[R+1] -= V;</code>. Finally, reconstruct by taking the Prefix Sum of $D$!</p>
+                            <p class="text-sm text-violet-900 font-medium">For <i class="font-serif">O(1)</i> static range updates <code class="bg-violet-100 px-1 rounded border border-violet-200">[L, R] += V</code>, apply: <code class="bg-white px-2 py-0.5 rounded shadow-sm border border-violet-200">D[L] += V; D[R+1] -= V;</code>. Finally, reconstruct by taking the Prefix Sum of <code class="bg-violet-100 px-1 rounded border border-violet-200 text-violet-900">D</code>!</p>
                         </div>
                     </div>
 

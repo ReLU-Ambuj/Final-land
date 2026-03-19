@@ -3,255 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day 2: Arrays – Basics, Traversal, Constraints (Intensive)</title>
+    <title>Day 2: Array Mastery Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Chosen Palette: Slate & Emerald Minimalist (Professional, crisp contrasts for reading) -->
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; scroll-behavior: smooth; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .nav-active { background-color: #ecfdf5; color: #047857; border-right: 4px solid #047857; font-weight: 600; }
-        pre { background-color: #0f172a; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
-        code { font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace; font-size: 0.875rem; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .chart-container { position: relative; width: 100%; max-width: 250px; margin-left: auto; margin-right: auto; height: 250px; max-height: 250px; }
+        .task-checkbox { appearance: none; background-color: #fff; margin: 0; font: inherit; color: currentColor; width: 1.5em; height: 1.5em; border: 2px solid #cbd5e1; border-radius: 0.25em; display: grid; place-content: center; cursor: pointer; transition: all 0.2s ease-in-out; }
+        .task-checkbox::before { content: ""; width: 0.8em; height: 0.8em; transform: scale(0); transition: 120ms transform ease-in-out; box-shadow: inset 1em 1em white; background-color: transform; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+        .task-checkbox:checked { background-color: #10b981; border-color: #10b981; }
+        .task-checkbox:checked::before { transform: scale(1); }
+        .task-row { transition: all 0.3s ease; }
+        .task-row.completed .task-text { color: #94a3b8; text-decoration: line-through; }
+        .task-row.completed .problem-desc { opacity: 0.5; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+<body class="antialiased min-h-screen pb-16 bg-slate-50">
 
-    <!-- Sidebar Navigation -->
-    <aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col h-full z-10 shadow-sm">
-        <div class="p-6 border-b border-slate-200">
-            <h1 class="text-xl font-bold text-slate-900 leading-tight">Array Mastery</h1>
-            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Day 2 &bull; Core Primative</p>
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">DAY 2</h1>
+                <p class="text-sm font-semibold text-slate-500 tracking-widest uppercase mt-1">Algorithm Bootcamp</p>
+            </div>
+            <div class="sm:text-right bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
+                <div class="text-xl font-bold text-emerald-600">Arrays & Pointers</div>
+                <div class="text-xs font-bold text-rose-500 uppercase tracking-wide flex items-center gap-1">
+                    <span class="text-base">🧠</span> Core Building Block
+                </div>
+            </div>
         </div>
-        <nav class="flex-1 overflow-y-auto py-4 hide-scroll" id="sidebar-nav">
-            <button onclick="switchTab('block1')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors nav-active" data-target="block1">
-                &#128218; Block 1: Architecture
-            </button>
-            <button onclick="switchTab('block2')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block2">
-                &#9881; Block 2: Problem Set
-            </button>
-            <button onclick="switchTab('block3')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block3">
-                &#128062; Block 3: Edge Cases
-            </button>
-        </nav>
-        <div class="p-4 border-t border-slate-200 text-xs text-center text-slate-400">
-            ICPC / Codeforces Prep
-        </div>
-    </aside>
+    </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto h-full bg-slate-50 relative pb-20">
-        <div class="max-w-5xl mx-auto px-8 py-12">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- BLOCK 1: ARCHITECTURE -->
-            <section id="block1" class="tab-content block">
-                <header class="mb-10">
-                    <h2 class="text-3xl font-extrabold text-slate-900">Block 1: Architectural Design</h2>
-                    <p class="text-lg text-slate-600 mt-2">The array represents the most direct abstraction of physical memory.</p>
-                </header>
+            <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-28">
+                <section class="bg-emerald-600 text-white p-6 rounded-2xl shadow-lg">
+                    <h2 class="text-lg font-bold flex items-center gap-2 mb-2">
+                        <span class="text-2xl">🎯</span> The Core Goal
+                    </h2>
+                    <p class="text-emerald-50 text-lg leading-relaxed mb-4">
+                        Master the physical abstraction of memory. Conquer O(1) <strong class="bg-emerald-800 text-white px-2 py-0.5 rounded font-mono shadow-inner text-base">In-Place</strong> array mutation without auxiliary space.
+                    </p>
+                </section>
 
-                <div class="space-y-12">
-                    <!-- Memory Models -->
-                    <div>
-                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">1. Static Arrays vs Heap Allocation</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                                <h4 class="font-bold text-lg text-slate-900 mb-2">Stack (Static)</h4>
-                                <p class="text-sm text-slate-600 mb-4">Governed by the compiler counting down the stack pointer. Nearly instantaneous allocation. Finite resource (1–8 MB).</p>
-                                <div class="bg-slate-100 p-3 rounded font-mono text-xs text-slate-700">int arr[100];</div>
-                            </div>
-                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                                <h4 class="font-bold text-lg text-slate-900 mb-2">Heap (Dynamic)</h4>
-                                <p class="text-sm text-slate-600 mb-4">Size can be resolved at runtime. Persists until `delete[]`. Higher allocation overhead and risks fragmentation without RAII.</p>
-                                <div class="bg-slate-100 p-3 rounded font-mono text-xs text-slate-700">int* arr = new int[n];</div>
-                            </div>
-                        </div>
+                <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">Study Progress</h3>
+                        <p class="text-sm text-slate-500">Track your 14-hour mastery plan.</p>
                     </div>
-
-                    <!-- Indexing Math -->
-                    <div>
-                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">2. Address Arithmetic & O(1) Fetch</h3>
-                        <p class="text-slate-700 mb-4">Because elements are contiguous, address calculation is a pure algebraic function. Zero-based indexing prevents $Index - 1$ calculations.</p>
-                        
-                        <div class="bg-slate-900 p-6 rounded-xl shadow-sm text-white font-mono text-center text-lg mb-4 tracking-wider">
-                            Address = Base + (Index <span class="text-emerald-400">&times;</span> sizeof(Type))
-                        </div>
-                        
-                        <p class="text-sm text-slate-600 bg-emerald-50 border border-emerald-100 p-4 rounded-lg">
-                            <strong class="text-emerald-800">C++ Pointer Translation:</strong> A dereference like `arr[i]` strictly translates to the pointer jump `*(arr + i)`. There are zero bounds checks natively.
-                        </p>
-                    </div>
-
-                    <!-- Amortized -->
-                    <div>
-                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">3. std::vector & Amortization</h3>
-                        <p class="text-slate-700 mb-4">A `vector` has `size` and `capacity`. When full, hitting `push_back(val)` forces a reallocation: an $O(n)$ process to allocate $2 \times$ space and move everything over.</p>
-                        <p class="text-slate-700">Using the Potential Method ($\Phi = 2 \times Size - Capacity$), the $O(1)$ operations "save up energy" to strictly pay for the $O(n)$ reallocation moving cost, proving Amortized $O(1)$ overall.</p>
-                    </div>
-
-                </div>
-            </section>
-
-            <!-- BLOCK 2: PROBLEMS -->
-            <section id="block2" class="tab-content hidden">
-                <header class="mb-10">
-                    <h2 class="text-3xl font-extrabold text-slate-900">Block 2: Core Array Problems (12 Patterns)</h2>
-                    <p class="text-lg text-slate-600 mt-2">Segregated problem mechanics. Test your pattern recognition.</p>
-                </header>
-
-                <div id="snippet-container" class="grid grid-cols-1 gap-6">
-                    <!-- Snippets injected by JS -->
-                </div>
-            </section>
-
-            <!-- BLOCK 3: EDGE CASES -->
-            <section id="block3" class="tab-content hidden">
-                <header class="mb-10">
-                    <h2 class="text-3xl font-extrabold text-slate-900">Block 3: Constraints & Edge Cases</h2>
-                    <p class="text-lg text-slate-600 mt-2">Checklists for Technical Interviews & CP Audits.</p>
-                </header>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                     
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xl font-bold mb-4 text-slate-800">The Edge Case Checklist</h3>
-                        <ul class="space-y-3 text-slate-700 text-sm">
-                            <li class="flex items-start"><span class="mr-2 text-emerald-600 font-bold">&check;</span> <strong>Empty Arrays:</strong> Return safely (0, -1, {}, etc.) when n=0.</li>
-                            <li class="flex items-start"><span class="mr-2 text-emerald-600 font-bold">&check;</span> <strong>Single Element:</strong> Algorithms like 'Majority' or 'Rotations' behave uniquely at n=1.</li>
-                            <li class="flex items-start"><span class="mr-2 text-emerald-600 font-bold">&check;</span> <strong>Duplicates:</strong> Can Two-Sum handle [3,3] correctly for target=6 without reusing index 0 twice?</li>
-                            <li class="flex items-start"><span class="mr-2 text-emerald-600 font-bold">&check;</span> <strong>Negative Inputs:</strong> Are your Prefix Max/Min arrays robust against arrays consisting solely of negatives?</li>
-                            <li class="flex items-start"><span class="mr-2 text-red-600 font-bold">X</span> <strong>Integer Overflow:</strong> If array elements are $10^9$ and $n=10^5$, sums exceed 32-bit `int`. Always accumulate in `long long`!</li>
-                        </ul>
+                    <div class="chart-container mb-6">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div class="text-3xl font-extrabold text-slate-800" id="hoursCompleted">0<span class="text-lg text-slate-500 font-medium">h</span></div>
+                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Completed</div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div class="text-3xl font-extrabold text-slate-800">14<span class="text-lg text-slate-500 font-medium">h</span></div>
+                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Total Planned</div>
+                        </div>
                     </div>
 
-                    <div class="bg-slate-900 text-slate-200 p-6 rounded-xl border border-slate-800 shadow-sm flex flex-col justify-center">
-                         <h3 class="text-xl font-bold mb-4 text-white">Cache Performance (Memory Wall)</h3>
-                         <p class="text-sm text-slate-300 leading-relaxed">
-                            Cache lines load 64-bytes at a time. An array fetch natively pre-loads the next several items into L1 Cache (Spatial Locality). 
-                            <br><br>
-                            If you allocate a `matrix[R][C]`, looping C inside R (Row-major) is lightning fast. Looping R inside C (Column-major jump) causes cache misses on every access.
-                         </p>
+                    <div class="mt-8">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="font-bold text-slate-700">Completion</span>
+                            <span class="font-bold text-emerald-600" id="percentText">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 shadow-inner overflow-hidden">
+                            <div class="bg-emerald-500 h-3 rounded-full transition-all duration-700 ease-out w-0 relative" id="progressBar"></div>
+                        </div>
                     </div>
+                </section>
+            </div>
 
+            <div class="lg:col-span-8 space-y-8" id="syllabusContainer">
+                
+                <div class="mb-2">
+                    <h2 class="text-2xl font-bold text-slate-800">Action Plan</h2>
+                    <p class="text-slate-600 mt-1">Follow the blocks sequentially. Document edge cases.</p>
                 </div>
-            </section>
-            
+
+                <!-- BLOCK 1: ARCHITECTURE -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><span class="text-2xl">📚</span> Block 1 — Architecture</h2>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">⏱️ 3 Hours</span>
+                    </div>
+                    
+                    <div class="p-6 space-y-4">
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-a1">
+                            <input type="checkbox" class="task-checkbox mt-1" onchange="toggleTask('a1')">
+                            <div class="flex-1">
+                                <span class="task-text font-semibold text-slate-800 text-lg block group-hover:text-blue-700">Static vs Dynamic</span>
+                                <div class="bg-slate-800 text-slate-300 p-4 rounded-lg mt-3 font-mono text-sm shadow-inner">
+                                    Stack: <span class="text-emerald-400">int arr[100];</span> -> Instant, size fixed, ~8MB limit.<br>
+                                    Heap: <span class="text-blue-400">int* arr = new int[n];</span> -> Persists, variable size.
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-a2">
+                            <input type="checkbox" class="task-checkbox mt-1" onchange="toggleTask('a2')">
+                            <div class="flex-1">
+                                <span class="task-text font-semibold text-slate-800 text-lg block group-hover:text-blue-700">Address Arithmetic</span>
+                                <div class="bg-slate-800 text-yellow-300 p-4 rounded-lg mt-3 font-mono text-sm shadow-inner">
+                                    Address = Base + (Index &times; sizeof(Type))
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-a3">
+                            <input type="checkbox" class="task-checkbox mt-1" onchange="toggleTask('a3')">
+                            <div class="flex-1">
+                                <span class="task-text font-semibold text-slate-800 text-lg block group-hover:text-blue-700">Amortized std::vector</span>
+                                <p class="problem-desc text-sm text-slate-600 mt-2">When full, reallocation costs <i class="font-serif">O(N)</i> to double the capacity. Why is `push_back` <i class="font-serif">O(1)</i>? Use the Potential Method to prove it.</p>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- BLOCK 2: BASIC PROBLEMS -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><span class="text-2xl">🛠️</span> Block 2 — Basics & Pointers</h2>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">⏱️ 3 Hours</span>
+                    </div>
+                    <div class="p-6 space-y-2">
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p1">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p1')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">1. Two Sum</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Hash map for <i class="font-serif">O(N)</i> unsorted. Two Pointers for sorted.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p2">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p2')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">2. Remove Element</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Fast-Slow pointer. Overwrite target values.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p3">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p3')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">3. Move Zeroes</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Bubble non-zeros forward with a slow pointer.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p4">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p4')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">4. Beautiful Matrix</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Do not simulate. Use Manhattan Distance: <code>|r - 2| + |c - 2|</code>.</p>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- BLOCK 3: INTERMEDIATE PROBLEMS -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><span class="text-2xl">⚙️</span> Block 3 — Math & Algorithms</h2>
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">⏱️ 3 Hours</span>
+                    </div>
+                    <div class="p-6 space-y-2">
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p5">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p5')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">5. Even Odds</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">N = 10<sup>12</sup>. Physical array crashes. Use parity math.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p6">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p6')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">6. Majority Element</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Boyer-Moore Voting Algorithm. <i class="font-serif">O(1)</i> space.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p7">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p7')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">7. Find Pivot Index</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Precalc total. Track <code>left_sum == total - left_sum - arr[i]</code>.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p8">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p8')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">8. Product Except Self</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Prefix passing left to right, then suffix pass right to left. No division used.</p>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- BLOCK 4: HARD PROBLEMS -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-rose-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><span class="text-2xl">🔥</span> Block 4 — Shifting & Sorting</h2>
+                        <span class="bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">⏱️ 3 Hours</span>
+                    </div>
+                    <div class="p-6 space-y-2">
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p9">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p9')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-rose-700 block">9. Missing Number</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Use XOR properties <code>x ^ x = 0</code> to bypass integer overflow.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p10">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p10')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-rose-700 block">10. Rotate Array</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Triple Reverse Trick. Reverse entire array, then chunks.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p11">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p11')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-rose-700 block">11. Merge Sorted Array</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Reverse merge starting from the back of the padded `nums1` array.</p>
+                            </div>
+                        </label>
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-p12">
+                            <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('p12')">
+                            <div>
+                                <span class="task-text font-bold text-slate-700 group-hover:text-rose-700 block">12. Sort Colors</span>
+                                <p class="problem-desc text-sm text-slate-500 mt-1">Dutch National Flag algorithm. Low(0), Mid(1), High(2) tri-partitioning in one pass.</p>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- BLOCK 5: EDGE CASES -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-violet-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><span class="text-2xl">⚡</span> Block 5 — Mechanics & Caching</h2>
+                        <span class="bg-violet-100 text-violet-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">⏱️ 2 Hours</span>
+                    </div>
+                    
+                    <div class="p-6">
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group mb-4" id="task-e1">
+                            <input type="checkbox" class="task-checkbox mt-1" onchange="toggleTask('e1')">
+                            <div class="flex-1">
+                                <span class="task-text font-semibold text-slate-800 text-lg block group-hover:text-violet-700">Audit the 5 Edge Cases</span>
+                                <ul class="list-none problem-desc text-sm text-slate-600 mt-2 space-y-1 ml-1 bg-slate-50 p-3 rounded border border-slate-200">
+                                    <li>&bull; Empty arrays (N=0)</li>
+                                    <li>&bull; Single elements (N=1)</li>
+                                    <li>&bull; Handing Duplicates</li>
+                                    <li>&bull; Purely Negative Elements</li>
+                                    <li>&bull; Integer Overflow (Sums > 2<sup>31</sup>-1)</li>
+                                </ul>
+                            </div>
+                        </label>
+
+                        <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group mb-6" id="task-e2">
+                            <input type="checkbox" class="task-checkbox mt-1" onchange="toggleTask('e2')">
+                            <div class="flex-1">
+                                <span class="task-text font-semibold text-slate-800 text-lg block group-hover:text-violet-700">Memory Wall (CPU Cache)</span>
+                                <p class="problem-desc text-sm text-slate-600 mt-2">Because Cache lines load 64-bytes ahead, Matrix looping C inside R (Row-major) is fast. Column-major looping causes cache-misses on every access!</p>
+                            </div>
+                        </label>
+
+                        <div class="bg-slate-800 rounded-xl p-5 shadow-inner mt-6">
+                            <div class="flex items-center gap-3 mb-3 text-white">
+                                <span class="text-xl">✍️</span>
+                                <h4 class="font-bold">Daily Review Note</h4>
+                            </div>
+                            <label class="task-row flex items-start gap-4 cursor-pointer" id="task-e3">
+                                <input type="checkbox" class="task-checkbox mt-1 border-slate-500 bg-slate-700 checked:bg-emerald-500 checked:border-emerald-500" onchange="toggleTask('e3')">
+                                <div class="flex-1">
+                                    <span class="task-text font-medium text-slate-200">Reflect on pointers vs iterations.</span>
+                                    <textarea placeholder="e.g. Using two-pointers requires sorted arrays or specific logic. Swapping in-place saves O(N) auxiliary space..." class="mt-3 w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-none h-24 custom-scrollbar"></textarea>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
         </div>
     </main>
 
-    <!-- JS Logic -->
     <script>
-        // --- Navigation Logic ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('nav-active'));
-            
-            document.getElementById(tabId).classList.remove('hidden');
-            document.querySelector(`[data-target="${tabId}"]`).classList.add('nav-active');
+        const tasksMap = {
+            'a1': 1, 'a2': 1, 'a3': 1, // Block 1 (3 tasks = 3 hours)
+            'p1': 0.75, 'p2': 0.75, 'p3': 0.75, 'p4': 0.75, // Block 2 (4 = 3 hours)
+            'p5': 0.75, 'p6': 0.75, 'p7': 0.75, 'p8': 0.75, // Block 3 (4 = 3 hours)
+            'p9': 0.75, 'p10':0.75, 'p11':0.75, 'p12':0.75, // Block 4 (4 = 3 hours)
+            'e1': 0.66, 'e2': 0.66, 'e3': 0.68 // Block 5 (3 = 2 hours)
+        };
+        const totalPlannedHours = 14;
+        let completedTasks = new Set();
+        let progressChart;
+
+        function initApp() {
+            initChart();
+            document.querySelectorAll('.task-checkbox').forEach(cb => cb.checked = false);
         }
 
-        // --- Block 2: 12 Problems Data ---
-        const problems = [
-            { 
-              title: "1. Two Sum", cat: "Trade-offs",
-              desc: "Find indices summing to target.",
-              ap1: "Hash Map: Iterate and store target-nums[i]. O(n) space/time.",
-              ap2: "Two-Pointer: If sorted, pointers at ends converging. O(1) space."
-            },
-            { 
-              title: "2. Remove Element", cat: "Fast-Slow Pointer",
-              desc: "In-place removal of all instances of `val`.",
-              ap1: "Maintain slow `write_ptr` that increments only when fast `read_ptr` finds valid elements to copy.",
-              ap2: ""
-            },
-            { 
-              title: "3. Move Zeroes", cat: "In-Place Modifications",
-              desc: "Push zeroes back while maintaining non-zero order.",
-              ap1: "Slow pointer targets next open slot, fast hunts non-zeros. Swap them when found, bubbling zero.",
-              ap2: ""
-            },
-            { 
-              title: "4. Beautiful Matrix", cat: "Mathematical Logic",
-              desc: "5x5 grid, move a '1' to (2,2) with swaps.",
-              ap1: "Do not simulate grid state. Calculate Manhattan Distance: |r - 2| + |c - 2|.",
-              ap2: ""
-            },
-            { 
-              title: "5. Even Odds", cat: "Constraints Management",
-              desc: "Given sequence $1..N$ odds then evens. Find K-th. $N = 10^{12}$.",
-              ap1: "Arrays physically crash at $10^{12}$. Resolve mathematically. Count odds. If $K \\le odd$, return $2K - 1$. Else return even math.",
-              ap2: ""
-            },
-            { 
-              title: "6. Majority Element", cat: "Boyer-Moore Voting",
-              desc: "Find element appearing > n/2 times.",
-              ap1: "Maintain candidate and count. On match, count++. On mismatch, count--. If count=0 switch candidate. Majority survives attrition.",
-              ap2: "O(n) time, O(1) space."
-            },
-            { 
-              title: "7. Find Pivot Index", cat: "Prefix/Suffix Math",
-              desc: "Index where left sum == right sum.",
-              ap1: "Precalc total sum. Iterate keeping left_sum. right_sum = total - left - arr[i]. Check match in O(1).",
-              ap2: ""
-            },
-            { 
-              title: "8. Product Except Self", cat: "Prefix Arrays",
-              desc: "Find products without division.",
-              ap1: "Build array of cumulative products to the left of i. Then backward pass multiplying by running suffix products.",
-              ap2: "Results array does not count towards auxiliary space."
-            },
-            { 
-              title: "9. Missing Number", cat: "Bitwise Logic",
-              desc: "Find single missing integer $0..N$.",
-              ap1: "Sum formula $\\frac{N(N+1)}{2}$ easily overflows. Use XOR instead: $x \\oplus x = 0$.",
-              ap2: "XOR 0..N, then XOR array elements. Missing number remains."
-            },
-            { 
-              title: "10. Rotate Array", cat: "Spatial Logic",
-              desc: "Shift right by K in O(1) space.",
-              ap1: "The Triple Reverse Trick. Reserve entire array structure.",
-              ap2: "Reverse(0, k-1) then Reverse(k, n-1) to reorient chunks."
-            },
-            { 
-              title: "11. Merge Sorted Array", cat: "Buffer Management",
-              desc: "Merge inside first array padded with zeros.",
-              ap1: "Reverse-Merge. Start at back of array checking maximums to avoid overwriting unread elements.",
-              ap2: ""
-            },
-            { 
-              title: "12. Sort Colors", cat: "Dutch National Flag",
-              desc: "Sort 0s, 1s, 2s in-place one pass.",
-              ap1: "Three pointers: low(0), mid(1), high(2). Iterate mid.",
-              ap2: "Trap: When swapping 2 dynamically from `high` into `mid`, do NOT increment `mid`. It must be re-checked!"
+        function toggleTask(taskId) {
+            const taskRow = document.getElementById(`task-${taskId}`);
+            if (completedTasks.has(taskId)) {
+                completedTasks.delete(taskId);
+                taskRow.classList.remove('completed');
+            } else {
+                completedTasks.add(taskId);
+                taskRow.classList.add('completed');
             }
-        ];
+            updateDashboard();
+        }
 
-        const container = document.getElementById('snippet-container');
-        problems.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = "bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden p-6";
+        function calculateProgress() {
+            let hours = 0;
+            completedTasks.forEach(t => hours += tasksMap[t]);
+            return Math.min(hours, totalPlannedHours);
+        }
+
+        function updateDashboard() {
+            const completedHours = calculateProgress();
+            const remainingHours = totalPlannedHours - completedHours;
+            const percentage = Math.round((completedHours / totalPlannedHours) * 100);
             
-            let aps = `<p class="text-emerald-700 text-sm mt-2 font-mono pb-1 border-b border-emerald-100">${item.ap1}</p>`;
-            if (item.ap2) {
-                 aps += `<p class="text-emerald-700 text-sm mt-1 font-mono">${item.ap2}</p>`;
+            document.getElementById('hoursCompleted').innerHTML = `${completedHours.toFixed(1)}<span class="text-lg text-slate-500 font-medium">h</span>`;
+            document.getElementById('percentText').innerText = `${percentage}%`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            
+            if(progressChart) {
+                progressChart.data.datasets[0].data = [completedHours, remainingHours];
+                progressChart.data.datasets[0].backgroundColor = percentage >= 99 ? ['#10b981', '#f1f5f9'] : ['#059669', '#f1f5f9'];
+                progressChart.update();
             }
+        }
 
-            card.innerHTML = `
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-3">
-                    <h3 class="font-bold text-lg text-slate-800">${item.title}</h3>
-                    <span class="text-xs font-bold uppercase tracking-wide bg-slate-100 text-slate-600 px-3 py-1 rounded mt-2 sm:mt-0 w-max">${item.cat}</span>
-                </div>
-                <p class="text-slate-600 text-sm mb-4">${item.desc}</p>
-                <div class="bg-emerald-50 border border-emerald-100 rounded p-4">
-                    <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Optimal Approach</h4>
-                    ${aps}
-                </div>
-            `;
-            container.appendChild(card);
-        });
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            progressChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed Time', 'Remaining Time'],
+                    datasets: [{
+                        data: [0, totalPlannedHours],
+                        backgroundColor: ['#059669', '#f1f5f9'],
+                        borderWidth: 0, hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '80%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b', padding: 12, cornerRadius: 8,
+                            callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.toFixed(1)} hrs` }
+                        }
+                    },
+                    animation: { animateScale: true, animateRotate: true }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    beforeDraw: chart => {
+                        const {width, height, ctx} = chart; ctx.restore();
+                        const percent = Math.round((chart.data.datasets[0].data[0] / totalPlannedHours) * 100) || 0;
+                        ctx.font = "900 " + (height / 100).toFixed(2) + "em Inter, sans-serif";
+                        ctx.textBaseline = "middle"; ctx.fillStyle = "#1e293b";
+                        ctx.fillText(percent + "%", Math.round((width - ctx.measureText(percent + "%").width) / 2), height / 2.1);
+                        ctx.font = "bold " + (height / 250).toFixed(2) + "em Inter, sans-serif"; ctx.fillStyle = "#64748b";
+                        ctx.fillText("DONE", Math.round((width - ctx.measureText("DONE").width) / 2), (height / 2.1) + (height*0.18));
+                        ctx.save();
+                    }
+                }]
+            });
+        }
 
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>

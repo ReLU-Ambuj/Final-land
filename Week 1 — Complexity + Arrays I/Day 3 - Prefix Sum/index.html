@@ -3,279 +3,735 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day 3: Prefix Sum (Cumulative Data Processing)</title>
+    <title>Day 3: Prefix Sum Mastery</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Chosen Palette: Slate & Indigo Minimalist (Professional, intellectual) -->
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; scroll-behavior: smooth; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .nav-active { background-color: #eef2ff; color: #4f46e5; border-right: 4px solid #4f46e5; font-weight: 600; }
-        pre { background-color: #0f172a; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
-        code { font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace; font-size: 0.875rem; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc; 
+            color: #1e293b; 
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 250px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 250px;
+        }
+        .task-checkbox {
+            appearance: none;
+            background-color: #fff;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.5em;
+            height: 1.5em;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.25em;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .task-checkbox::before {
+            content: "";
+            width: 0.8em;
+            height: 0.8em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            background-color: transform;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .task-checkbox:checked {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        .task-checkbox:checked::before {
+            transform: scale(1);
+        }
+        .task-row {
+            transition: all 0.3s ease;
+        }
+        .task-row.completed .task-text {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+        .task-row.completed .problem-desc {
+            opacity: 0.5;
+        }
+        .array-cell {
+            transition: all 0.3s ease;
+        }
+        .highlight-calc {
+            background-color: #fef08a;
+            border-color: #eab308;
+            transform: scale(1.05);
+        }
+        .highlight-result {
+            background-color: #10b981;
+            color: white;
+            border-color: #059669;
+            transform: scale(1.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+<body class="antialiased min-h-screen pb-16">
 
-    <!-- Sidebar Navigation -->
-    <aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col h-full z-10 shadow-sm">
-        <div class="p-6 border-b border-slate-200">
-            <h1 class="text-xl font-bold text-slate-900 leading-tight">Prefix Sum</h1>
-            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Day 3 &bull; Aggregation</p>
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">DAY 3</h1>
+                <p class="text-sm font-semibold text-slate-500 tracking-widest uppercase mt-1">Algorithm Bootcamp</p>
+            </div>
+            <div class="sm:text-right bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
+                <div class="text-xl font-bold text-indigo-600">Prefix Sum & Diffs</div>
+                <div class="text-xs font-bold text-rose-500 uppercase tracking-wide flex items-center gap-1">
+                    <span class="text-base">🔥</span> Extremely Important
+                </div>
+            </div>
         </div>
-        <nav class="flex-1 overflow-y-auto py-4 hide-scroll" id="sidebar-nav">
-            <button onclick="switchTab('block1')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors nav-active" data-target="block1">
-                &#128200; Block 1: The Paradigm
-            </button>
-            <button onclick="switchTab('block2')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block2">
-                &#128221; Block 2: Problem Set
-            </button>
-            <button onclick="switchTab('block3')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block3">
-                &#128270; Block 3: The Hash Trick
-            </button>
-        </nav>
-        <div class="p-4 border-t border-slate-200 text-xs text-center text-slate-400">
-            Cumulative State Control
-        </div>
-    </aside>
+    </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto h-full bg-slate-50 relative pb-20">
-        <div class="max-w-5xl mx-auto px-8 py-12">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- BLOCK 1: ARCHITECTURE -->
-            <section id="block1" class="tab-content block">
-                <header class="mb-10">
-                    <h2 class="text-3xl font-extrabold text-slate-900">Block 1: Architectural Design</h2>
-                    <p class="text-lg text-slate-600 mt-2">Transitioning from linear-time $O(n)$ sequence scanning to constant-time $O(1)$ query aggregation.</p>
-                </header>
+            <div class="lg:col-span-4 space-y-6 lg:sticky lg:top-28">
+                
+                <section class="bg-indigo-600 text-white p-6 rounded-2xl shadow-lg">
+                    <h2 class="text-lg font-bold flex items-center gap-2 mb-2">
+                        <span class="text-2xl">🎯</span> The Core Goal
+                    </h2>
+                    <p class="text-indigo-100 text-lg leading-relaxed mb-4">
+                        Answer range queries in <strong class="bg-indigo-800 text-white px-2 py-0.5 rounded font-mono shadow-inner text-xl">O(1)</strong> time complexity after an <strong class="font-mono text-indigo-200">O(n)</strong> preprocessing step.
+                    </p>
+                    <p class="text-sm text-indigo-200 border-t border-indigo-500 pt-3">
+                        Master the transition from sliding windows to <span class="font-bold text-white">HashSet state-tracking</span> for $O(N)$ subarray discovery.
+                    </p>
+                </section>
 
-                <div class="space-y-12">
-                    <!-- Formulas -->
-                    <div>
-                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">1. Inclusion-Exclusion Formulas</h3>
-                        
-                        <div class="grid grid-cols-1 gap-6">
-                            <div class="bg-indigo-900 p-6 rounded-xl shadow-sm text-white font-mono text-center text-xl mb-4 tracking-wider">
-                                Sum(L, R) = P[R] - P[L-1]
-                            </div>
-                            <p class="text-slate-700 bg-white border border-slate-200 p-6 rounded-lg shadow-sm text-sm">
-                                Precompute cumulative totals so that the internal dependencies of a sequence are mathematically resolved. Any arbitrary segment is isolated and evaluated through strict algebraic subtraction of unwanted prefixes.
-                            </p>
+                <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">Study Progress</h3>
+                        <p class="text-sm text-slate-500">Track your 14-hour mastery plan.</p>
+                    </div>
+                    
+                    <div class="chart-container mb-6">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div class="text-3xl font-extrabold text-slate-800" id="hoursCompleted">0<span class="text-lg text-slate-500 font-medium">h</span></div>
+                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Completed</div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div class="text-3xl font-extrabold text-slate-800">14<span class="text-lg text-slate-500 font-medium">h</span></div>
+                            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Total Planned</div>
                         </div>
                     </div>
 
-                    <!-- Scan Generalizations -->
-                    <div>
-                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">2. Scan Operator Inverses</h3>
-                        <p class="text-slate-700 mb-4">Any associative operator with an <strong class="text-indigo-600">inverse</strong> allows for O(1) range queries.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded text-sm text-indigo-900 font-mono text-center">
-                                a &oplus; b &rarr; P[R] &oplus; P[L-1]<br>
-                                <span class="text-xs text-indigo-500 block mt-1">(XOR is its own inverse)</span>
-                            </div>
-                            <div class="bg-red-50 border border-red-100 p-4 rounded text-sm text-red-900 font-mono text-center opacity-70">
-                                max(L, R) &rarr; <span class="line-through">P[R] - P[L-1]</span><br>
-                                <span class="text-xs text-red-500 block mt-1">(Max has no inverse!)</span>
+                    <div class="mt-8">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="font-bold text-slate-700">Completion</span>
+                            <span class="font-bold text-emerald-600" id="percentText">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 shadow-inner overflow-hidden">
+                            <div class="bg-emerald-500 h-3 rounded-full transition-all duration-700 ease-out w-0 relative" id="progressBar">
+                                <div class="absolute inset-0 bg-white/20 w-full animate-pulse"></div>
                             </div>
                         </div>
                     </div>
+                </section>
+                
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm text-slate-600 flex gap-3 shadow-sm">
+                    <span class="text-xl">💡</span>
+                    <p>Interact with the theory and check off problems below as you solve them on your preferred coding platform to update your progress.</p>
+                </div>
 
-                    <!-- 2D Extension -->
-                    <div>
-                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">3. Spatial Scaling (2D Matrix sums)</h3>
-                        <p class="text-sm text-slate-600 mb-4 bg-white border border-slate-200 p-6 rounded-xl shadow-sm">
-                            <strong class="text-indigo-800 block text-base mb-2">The 2D Formula:</strong>
-                            <code>Sum(r1, c1, r2, c2) = P[r2][c2] - P[r1-1][c2] - P[r2][c1-1] + P[r1-1][c1-1]</code>
-                            <br><br>
-                            This technique (The Integral Image) powers early real-time Computer Vision like Haar-Cascade face detection (Viola-Jones).
-                        </p>
+            </div>
+
+            <div class="lg:col-span-8 space-y-8" id="syllabusContainer">
+                
+                <div class="mb-2">
+                    <h2 class="text-2xl font-bold text-slate-800">Action Plan</h2>
+                    <p class="text-slate-600 mt-1">Follow the blocks sequentially to build deep intuition across all 11 core problems.</p>
+                </div>
+
+                <!-- BLOCK 1: THEORY -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span class="text-2xl">📚</span> Block 1 — Theory & Mechanics
+                            </h2>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                            ⏱️ 3 Hours
+                        </span>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="space-y-4 mb-8">
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-t1">
+                                <input type="checkbox" class="task-checkbox mt-1" onchange="toggleTask('t1', 1)">
+                                <div class="flex-1">
+                                    <span class="task-text font-semibold text-slate-800 text-lg block group-hover:text-blue-700 transition-colors">Understand Definition</span>
+                                    <div class="bg-slate-800 text-blue-300 p-4 rounded-lg mt-3 font-mono text-sm sm:text-base shadow-inner overflow-x-auto custom-scrollbar">
+                                        prefix[i] = a[0] + a[1] + ... + a[i]
+                                    </div>
+                                    <p class="problem-desc text-sm text-slate-600 mt-2">The transformation of static sequences into a cumulative state.</p>
+                                </div>
+                            </label>
+
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-t2">
+                                <input type="checkbox" class="task-checkbox mt-1" onchange="toggleTask('t2', 1)">
+                                <div class="flex-1">
+                                    <span class="task-text font-semibold text-slate-800 text-lg block group-hover:text-blue-700 transition-colors">Master Range Sum Math</span>
+                                    <div class="bg-slate-800 text-emerald-300 p-4 rounded-lg mt-3 font-mono text-sm sm:text-base shadow-inner overflow-x-auto custom-scrollbar">
+                                        sum(l,r) = prefix[r] - prefix[l-1]
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-2 font-medium bg-slate-100 inline-block px-2 py-1 rounded">* Handle l=0 edge case: sum(0,r) = prefix[r]</p>
+                                </div>
+                            </label>
+
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group" id="task-t3">
+                                <input type="checkbox" class="task-checkbox mt-1" onchange="toggleTask('t3', 1)">
+                                <div class="flex-1">
+                                    <span class="task-text font-semibold text-slate-800 text-lg block group-hover:text-blue-700 transition-colors">Complexity Trade-Offs</span>
+                                    <div class="grid grid-cols-2 gap-4 mt-3">
+                                        <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-center shadow-sm">
+                                            <div class="text-xs text-amber-700 font-bold uppercase tracking-wide">Build array</div>
+                                            <div class="text-xl font-mono font-bold text-amber-900 mt-1">O(n)</div>
+                                        </div>
+                                        <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-center shadow-sm">
+                                            <div class="text-xs text-emerald-700 font-bold uppercase tracking-wide">Query Range</div>
+                                            <div class="text-xl font-mono font-bold text-emerald-900 mt-1">O(1)</div>
+                                        </div>
+                                    </div>
+                                    <p class="problem-desc text-sm text-slate-600 mt-3 border-t border-slate-200 pt-2">Warning: An O(1) point update in the original array forces an O(n) re-build of the prefix array! Only use on <strong>Static</strong> data.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Interactive Visualizer -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-inner">
+                            <h4 class="font-bold text-slate-800 mb-4 flex justify-between items-center">
+                                <span>Interactive Visualizer: Building & Querying</span>
+                                <button onclick="resetVisualizer()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded transition-colors font-medium">Reset</button>
+                            </h4>
+                            
+                            <div class="mb-6 overflow-x-auto pb-2">
+                                <div class="flex items-center gap-2 mb-2 min-w-max">
+                                    <span class="font-mono text-sm text-slate-600 w-16 text-right">a[i]:</span>
+                                    <div class="flex gap-2" id="originalArray">
+                                        <div class="w-10 h-10 flex items-center justify-center bg-white border-2 border-slate-300 font-bold rounded shadow-sm text-slate-700">3</div>
+                                        <div class="w-10 h-10 flex items-center justify-center bg-white border-2 border-slate-300 font-bold rounded shadow-sm text-slate-700">1</div>
+                                        <div class="w-10 h-10 flex items-center justify-center bg-white border-2 border-slate-300 font-bold rounded shadow-sm text-slate-700">4</div>
+                                        <div class="w-10 h-10 flex items-center justify-center bg-white border-2 border-slate-300 font-bold rounded shadow-sm text-slate-700">2</div>
+                                        <div class="w-10 h-10 flex items-center justify-center bg-white border-2 border-slate-300 font-bold rounded shadow-sm text-slate-700">5</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 relative min-w-max">
+                                    <span class="font-mono text-sm text-blue-600 font-bold w-16 text-right">prefix:</span>
+                                    <div class="flex gap-2" id="prefixArray">
+                                        <div class="w-10 h-10 flex items-center justify-center bg-slate-100 border-2 border-slate-200 font-bold rounded text-slate-400 array-cell" id="p0">?</div>
+                                        <div class="w-10 h-10 flex items-center justify-center bg-slate-100 border-2 border-slate-200 font-bold rounded text-slate-400 array-cell" id="p1">?</div>
+                                        <div class="w-10 h-10 flex items-center justify-center bg-slate-100 border-2 border-slate-200 font-bold rounded text-slate-400 array-cell" id="p2">?</div>
+                                        <div class="w-10 h-10 flex items-center justify-center bg-slate-100 border-2 border-slate-200 font-bold rounded text-slate-400 array-cell" id="p3">?</div>
+                                        <div class="w-10 h-10 flex items-center justify-center bg-slate-100 border-2 border-slate-200 font-bold rounded text-slate-400 array-cell" id="p4">?</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-4 items-center">
+                                <button id="buildBtn" onclick="buildPrefix()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md">
+                                    1. Build Prefix Array
+                                </button>
+                                <div id="querySection" class="hidden flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm flex-wrap w-full sm:w-auto">
+                                    <span class="font-bold text-slate-700 text-sm">2. Query:</span>
+                                    <label class="text-sm font-mono text-slate-600">L:<input type="number" id="qL" min="0" max="4" value="1" class="w-12 ml-1 p-1 border rounded text-center font-bold outline-none focus:ring-2 ring-blue-500"></label>
+                                    <label class="text-sm font-mono text-slate-600">R:<input type="number" id="qR" min="0" max="4" value="3" class="w-12 ml-1 p-1 border rounded text-center font-bold outline-none focus:ring-2 ring-blue-500"></label>
+                                    <button onclick="executeQuery()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded transition-colors text-sm shadow-sm">Calc sum(L,R)</button>
+                                </div>
+                            </div>
+                            <div id="queryResult" class="mt-4 text-slate-700 font-mono text-sm hidden bg-emerald-50 p-3 rounded border border-emerald-200">
+                                Result will appear here...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- BLOCK 2: BASIC PROBLEMS -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span class="text-2xl">🛠️</span> Block 2 — Basic Subarrays
+                            </h2>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                            ⏱️ 3 Hours
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-slate-500 mb-4 font-medium uppercase tracking-wide border-b border-slate-100 pb-2">Must Solve (4 Problems)</p>
+                        <div class="space-y-2">
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-b1">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('b1', 2)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">1. Range Sum Query - Immutable</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Implement the `NumArray` class with an $O(1)$ `sumRange` method.</p>
+                                </div>
+                            </label>
+
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-b2">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('b2', 2)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">2. Running Sum of 1D Array</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Calculate the $S[i] = S[i-1] + a[i]$ running sum in-place.</p>
+                                </div>
+                            </label>
+
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100 bg-emerald-50/50" id="task-b3">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('b3', 2)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-800 group-hover:text-emerald-700 block text-base">3. Subarray Sum Equals K <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded ml-2 uppercase font-bold tracking-wider">Crucial</span></span>
+                                    <p class="problem-desc text-sm text-slate-600 mt-1">Find the total number of continuous subarrays whose sum equals to `k`. Use a HashMap to track frequencies of prefix sums.</p>
+                                </div>
+                            </label>
+
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-b4">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('b4', 2)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-emerald-700 block">4. Find Pivot Index</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Find the equilibrium index where `left_sum == right_sum`. Done in $O(n)$ time using `total_sum` subtraction.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- BLOCK 3: INTERMEDIATE -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span class="text-2xl">⚙️</span> Block 3 — The Map Trick (Parity/Modulo)
+                            </h2>
+                        </div>
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                            ⏱️ 3 Hours
+                        </span>
+                    </div>
+                    
+                    <div class="bg-amber-50 border-b border-amber-200 px-6 py-4 flex gap-4 items-center">
+                        <div class="text-3xl">🔑</div>
+                        <div>
+                            <div class="text-xs font-bold text-amber-800 uppercase tracking-widest mb-1">Key Insight</div>
+                            <div class="text-base font-mono font-bold text-amber-900 bg-white inline-block px-3 py-1 rounded shadow-sm border border-amber-200">
+                                P[j] = P[i] - K
+                            </div>
+                            <p class="text-sm text-amber-800 mt-2 font-medium">Instead of a sliding window (which fails on negatives), calculate the running sum and ask your HashMap: "Have I seen the exact prefix sum needed to leave a remainder of target K?"</p>
+                        </div>
                     </div>
 
-                </div>
-            </section>
+                    <div class="p-6">
+                        <p class="text-sm text-slate-500 mb-4 font-medium uppercase tracking-wide border-b border-slate-100 pb-2">Must Solve (4 Problems)</p>
+                        <div class="space-y-2">
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-i1">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('i1', 3)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">5. Continuous Subarray Sum</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Math twist: Track `prefix % K` in the map. If the same modulo is seen $\ge 2$ indices apart, a multiple-of-K subarray exists.</p>
+                                </div>
+                            </label>
 
-            <!-- BLOCK 2: PROBLEMS -->
-            <section id="block2" class="tab-content hidden">
-                <header class="mb-10">
-                    <h2 class="text-3xl font-extrabold text-slate-900">Block 2: Core Prefix Patterns (11 Variants)</h2>
-                    <p class="text-lg text-slate-600 mt-2">Segregated problem mechanics. Test your pattern mapping.</p>
-                </header>
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-i2">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('i2', 3)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">6. Maximum Size Subarray Sum Equals K</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Instead of counting frequencies, store the <strong>earliest index</strong> a sum was seen to maximize $(i - j)$.</p>
+                                </div>
+                            </label>
 
-                <div id="snippet-container" class="grid grid-cols-1 gap-6">
-                    <!-- Snippets injected by JS -->
-                </div>
-            </section>
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-i3">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('i3', 3)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">7. Contiguous Array</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Find the max subarray with equal 0s and 1s by treating 0s as `-1`. Look for repeated prefix sums in the map.</p>
+                                </div>
+                            </label>
 
-            <!-- BLOCK 3: HASH TRICK -->
-            <section id="block3" class="tab-content hidden">
-                <header class="mb-10">
-                    <h2 class="text-3xl font-extrabold text-slate-900">Block 3: The Map Trick ($O(N^2) \rightarrow O(N)$)</h2>
-                    <p class="text-lg text-slate-600 mt-2">Combining cumulative parity and hashing.</p>
-                </header>
-
-                <div class="mb-12">
-                    <div class="bg-indigo-900 text-indigo-200 p-8 rounded-xl border border-indigo-800 shadow-sm">
-                         <h3 class="text-2xl font-bold mb-4 text-white font-mono">P[i] - P[j] = K</h3>
-                         <p class="text-base text-indigo-300 leading-relaxed mb-6">
-                             When scanning an array looking for a dynamic condition $K$ (e.g. subarray sum equals K), we mathematically transform the request from a 2-pointer sliding window into a <strong>historic lookup</strong>. 
-                         </p>
-                         <div class="bg-white/10 p-4 rounded font-mono text-sm text-indigo-100">
-                             Since: P[i] - P[j] = K<br>
-                             Then: P[j] = P[i] - K
-                         </div>
-                         <p class="text-sm text-indigo-300 mt-6">
-                            As you iterate and generate $P[i]$, you simultaneously query a Hash Map for the existence of $P[i] - K$. If found, you immediately know a subarray exists ending at your current index.
-                         </p>
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-i4">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('i4', 3)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-amber-700 block">8. Binary Subarrays With Sum</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Can be solved with Prefix Map, or the $O(1)$ space `AtMost(K) - AtMost(K-1)` sliding window trick.</p>
+                                </div>
+                            </label>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="overflow-hidden bg-white rounded-xl shadow-sm border border-slate-200">
-                    <table class="min-w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-800 uppercase text-xs font-bold font-mono">
-                            <tr>
-                                <th class="px-6 py-4">Problem Goal</th>
-                                <th class="px-6 py-4">Hash Key</th>
-                                <th class="px-6 py-4">Hash Value</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 font-mono text-xs">
-                            <tr>
-                                <td class="px-6 py-4 bg-indigo-50/30">Exact Sum == K</td>
-                                <td class="px-6 py-4 text-indigo-600 font-bold">prefix_sum</td>
-                                <td class="px-6 py-4">Frequency count</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 bg-indigo-50/30">Max Length for Sum K</td>
-                                <td class="px-6 py-4 text-indigo-600 font-bold">prefix_sum</td>
-                                <td class="px-6 py-4">Earliest index seen (DO NOT update)</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 bg-indigo-50/30">Divisible by K</td>
-                                <td class="px-6 py-4 text-indigo-600 font-bold">prefix_sum % K</td>
-                                <td class="px-6 py-4">Earliest index seen</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 bg-indigo-50/30">Equal 0s and 1s</td>
-                                <td class="px-6 py-4 text-indigo-600 font-bold">Count(1) - Count(0)</td>
-                                <td class="px-6 py-4">Earliest index seen</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <!-- BLOCK 4: HARD SCALING -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-rose-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span class="text-2xl">🔥</span> Block 4 — Dimensional Scaling (Hard)
+                            </h2>
+                        </div>
+                        <span class="bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                            ⏱️ 3 Hours
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-slate-500 mb-4 font-medium uppercase tracking-wide border-b border-slate-100 pb-2">Must Solve (2 Problems)</p>
+                        <div class="space-y-2 mb-6">
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-h1">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('h1', 4)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-rose-700 block">9. Number of Submatrices that Sum to Target</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Fix $R1$ and $R2$, compressing the 2D height into a 1D column-sum row. Apply the `Subarray Sum K` Hash Map logic from Problem 3. Drops $O(R^2 C^2) \rightarrow O(R^2 C)$.</p>
+                                </div>
+                            </label>
+                            
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-h2">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('h2', 4)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-rose-700 block">10. Maximum Average Subarray II</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Binary search the result average. Subtract average candidate $C$ from all items: condition becomes finding a subarray $\ge$ length K where $Sum(a_i - C) \ge 0$.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
 
-            </section>
-            
+                <!-- BLOCK 5: DIFFERENCE ARRAYS -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-violet-500"></div>
+                    <div class="px-6 py-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span class="text-2xl">⚡</span> Block 5 — Difference Arrays
+                            </h2>
+                        </div>
+                        <span class="bg-violet-100 text-violet-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                            ⏱️ 2 Hours
+                        </span>
+                    </div>
+                    
+                    <div class="bg-violet-50 border-b border-violet-200 px-6 py-4 flex gap-4 items-center">
+                        <div class="text-3xl">🧮</div>
+                        <div>
+                            <div class="text-xs font-bold text-violet-800 uppercase tracking-widest mb-1">The Dual Operation</div>
+                            <p class="text-sm text-violet-900 font-medium">For $O(1)$ static range updates $[L, R] += V$, apply: <code class="bg-white px-2 py-0.5 rounded shadow-sm border border-violet-200">D[L] += V; D[R+1] -= V;</code>. Finally, reconstruct by taking the Prefix Sum of $D$!</p>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="space-y-2 mb-6">
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-d1">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('d1', 5)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-violet-700 block">11. Corporate Flight Bookings</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Apply difference array logic offline, then prefix sum to build the final reservations array.</p>
+                                </div>
+                            </label>
+
+                            <label class="task-row flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl cursor-pointer group border border-transparent hover:border-slate-100" id="task-d2">
+                                <input type="checkbox" class="task-checkbox mt-0.5" onchange="toggleTask('d2', 5)">
+                                <div>
+                                    <span class="task-text font-bold text-slate-700 group-hover:text-violet-700 block">12. Car Pooling</span>
+                                    <p class="problem-desc text-sm text-slate-500 mt-1">Sweep Line variant. Verify if the reconstructed running summation ever breaches the given capacity.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="bg-slate-800 rounded-xl p-5 shadow-inner mt-6">
+                            <div class="flex items-center gap-3 mb-3 text-white">
+                                <span class="text-xl">✍️</span>
+                                <h4 class="font-bold">Daily Review Note</h4>
+                            </div>
+                            <label class="task-row flex items-start gap-4 cursor-pointer" id="task-d3">
+                                <input type="checkbox" class="task-checkbox mt-1 border-slate-500 bg-slate-700 checked:bg-emerald-500 checked:border-emerald-500" onchange="toggleTask('d3', 5)">
+                                <div class="flex-1">
+                                    <span class="task-text font-medium text-slate-200">Document your synthesis of Prefix Sum limits.</span>
+                                    <textarea placeholder="e.g. Map lookup simplifies windows; Parity equals 0 allows -1 tricks; Update cost is heavy..." class="mt-3 w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none h-24 custom-scrollbar"></textarea>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
         </div>
     </main>
 
-    <!-- JS Logic -->
     <script>
-        // --- Navigation Logic ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('nav-active'));
+        // Total configuration of blocks (Total 14 hours)
+        const blocksData = {
+            1: { totalHours: 3, weight: 3, tasks: ['t1', 't2', 't3'] },
+            2: { totalHours: 3, weight: 4, tasks: ['b1', 'b2', 'b3', 'b4'] }, // Basic
+            3: { totalHours: 3, weight: 4, tasks: ['i1', 'i2', 'i3', 'i4'] }, // Intermediate
+            4: { totalHours: 3, weight: 2, tasks: ['h1', 'h2'] }, // Hard
+            5: { totalHours: 2, weight: 3, tasks: ['d1', 'd2', 'd3'] }  // Diff Arrays + Note
+        };
+
+        const totalPlannedHours = 14;
+        let completedTasks = new Set();
+        let progressChart;
+
+        function initApp() {
+            initChart();
+            updateDashboard();
             
-            document.getElementById(tabId).classList.remove('hidden');
-            document.querySelector(`[data-target="${tabId}"]`).classList.add('nav-active');
+            document.querySelectorAll('.task-checkbox').forEach(cb => {
+                cb.checked = false;
+            });
         }
 
-        // --- Block 2: 11 Problems Data ---
-        const problems = [
-            { 
-              title: "1. Range Sum Query - Immutable", cat: "Static Optimization",
-              desc: "Given multiple (L, R) range queries, optimize them to O(1).",
-              ap1: "Build array P of size N+1 where P[i+1] = P[i] + val[i].",
-              ap2: "Return `P[right + 1] - P[left]`."
-            },
-            { 
-              title: "2. Running Sum of 1D Array", cat: "Idempotent State",
-              desc: "Return the cumulative running sum.",
-              ap1: "Mutate array in-place. `nums[i] += nums[i-1]`.",
-              ap2: ""
-            },
-            { 
-              title: "3. Subarray Sum Equals K", cat: "HashMap + Prefix",
-              desc: "Count subarrays that sum exactly to target k. Numbers can be negative.",
-              ap1: "P[j] = P[i] - k. Hash `{running_sum: frequency}`.",
-              ap2: "Add hash_map[sum - k] to your answer counter on each step."
-            },
-            { 
-              title: "4. Continuous Subarray Sum", cat: "Modular Math",
-              desc: "Find if any subarray length >= 2 sums to a multiple of k.",
-              ap1: "Hash `{ (sum % k) : earliest_index }`. If same mod seen at distance >= 2, return true.",
-              ap2: "C++ requires manual correction for negative modulo values: `if (rem < 0) rem += k;`"
-            },
-            { 
-              title: "5. Max Size Subarray Sum Equals K", cat: "HashMap Edge Cases",
-              desc: "Find maximum width of a subarray summing to k.",
-              ap1: "Hash `{running_sum: earliest_index}`.",
-              ap2: "TRAP: Only insert key if it does NOT exist. If you overwrite the index, you shrink lengths."
-            },
-            { 
-              title: "6. Binary Subarrays With Sum", cat: "Scaling Math / AtMost Trick",
-              desc: "Given array of 1s and 0s, count subarrays summing to goal.",
-              ap1: "Hash map works universally. Alternatively, use O(1) space AtMost sliding window strategy.",
-              ap2: "Return `AtMost(goal) - AtMost(goal - 1)`."
-            },
-            { 
-              title: "7. Contiguous Array", cat: "Parity Equilibrium",
-              desc: "Max length subarray with equal 1s and 0s.",
-              ap1: "Treat 0 as -1. Treat 1 as +1. Problem simplifies to 'Find max length subarray summing to 0'.",
-              ap2: "Use Prefix HashMap tracking `0` offset."
-            },
-            { 
-              title: "8. Submatrices That Sum to Target", cat: "2D Compression",
-              desc: "Scale 2D arrays to 1D prefix queries.",
-              ap1: "Fix `top_row` and `bottom_row`. Compress the matrix heights into a 1D column sums array.",
-              ap2: "Run standard 1D 'Subarray sum equals K' across columns. O(R^2 * C)"
-            },
-            { 
-              title: "9. Max Average Subarray II", cat: "Binary Search + Bounds",
-              desc: "Find the max average of a contiguous array of length >= k.",
-              ap1: "Binary search the average boundary. Subtract the 'candidate_avg' from all elements.",
-              ap2: "If any prefix_sum minus the (min_prefix seen at least K steps ago) >= 0, the avg is possible!"
-            },
-            { 
-              title: "10. Corporate Flight Bookings", cat: "1D Difference Array",
-              desc: "Process offline point-range updates rapidly.",
-              ap1: "D[first] += seats. D[last+1] -= seats.",
-              ap2: "Compute prefix sum of D to reconstruct the static array."
-            },
-            { 
-              title: "11. Car Pooling", cat: "Sweep Line",
-              desc: "Can car pick up passengers effectively?",
-              ap1: "Similar to Difference Array indexing: D[pickup] += P; D[dropoff] -= P.",
-              ap2: "If running sum ever exceeds capacity, return false."
-            }
-        ];
-
-        const container = document.getElementById('snippet-container');
-        problems.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = "bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden p-6";
+        function toggleTask(taskId, blockId) {
+            const taskRow = document.getElementById(`task-${taskId}`);
             
-            let aps = `<p class="text-indigo-700 text-sm mt-2 font-mono pb-1 border-b border-indigo-100">${item.ap1}</p>`;
-            if (item.ap2) {
-                 aps += `<p class="text-indigo-700 text-sm mt-1 font-mono">${item.ap2}</p>`;
+            if (completedTasks.has(taskId)) {
+                completedTasks.delete(taskId);
+                taskRow.classList.remove('completed');
+            } else {
+                completedTasks.add(taskId);
+                taskRow.classList.add('completed');
+            }
+            
+            updateDashboard();
+        }
+
+        function calculateProgress() {
+            let completedHours = 0;
+            
+            for (const [blockId, block] of Object.entries(blocksData)) {
+                let blockCompletedTasks = 0;
+                block.tasks.forEach(taskId => {
+                    if (completedTasks.has(taskId)) blockCompletedTasks++;
+                });
+                
+                const completionRatio = blockCompletedTasks / block.tasks.length;
+                completedHours += (block.totalHours * completionRatio);
+            }
+            
+            return Math.min(completedHours, totalPlannedHours); // Cap effectively
+        }
+
+        function updateDashboard() {
+            const completedHours = calculateProgress();
+            const remainingHours = totalPlannedHours - completedHours;
+            const percentage = Math.round((completedHours / totalPlannedHours) * 100);
+            
+            document.getElementById('hoursCompleted').innerHTML = `${completedHours.toFixed(1)}<span class="text-lg text-slate-500 font-medium">h</span>`;
+            document.getElementById('percentText').innerText = `${percentage}%`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            
+            if(progressChart) {
+                progressChart.data.datasets[0].data = [completedHours, remainingHours];
+                if(percentage >= 99) {
+                     progressChart.data.datasets[0].backgroundColor = ['#10b981', '#f1f5f9'];
+                } else {
+                     progressChart.data.datasets[0].backgroundColor = ['#4f46e5', '#f1f5f9']; // Indigo
+                }
+                progressChart.update();
+            }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            
+            progressChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed Time', 'Remaining Time'],
+                    datasets: [{
+                        data: [0, totalPlannedHours],
+                        backgroundColor: ['#4f46e5', '#f1f5f9'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.parsed.toFixed(1)} hrs`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    beforeDraw: function(chart) {
+                        const width = chart.width;
+                        const height = chart.height;
+                        const ctx = chart.ctx;
+                        ctx.restore();
+                        
+                        const data = chart.data.datasets[0].data;
+                        const percent = Math.round((data[0] / totalPlannedHours) * 100) || 0;
+                        
+                        ctx.font = "900 " + (height / 100).toFixed(2) + "em Inter, sans-serif";
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = "#1e293b";
+                        const text = percent + "%";
+                        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                        const textY = height / 2.1;
+                        ctx.fillText(text, textX, textY);
+                        
+                        ctx.font = "bold " + (height / 250).toFixed(2) + "em Inter, sans-serif";
+                        ctx.fillStyle = "#64748b";
+                        const subText = "DONE";
+                        const subTextX = Math.round((width - ctx.measureText(subText).width) / 2);
+                        ctx.fillText(subText, subTextX, textY + (height*0.18));
+                        ctx.save();
+                    }
+                }]
+            });
+        }
+
+        // --- Visualizer Logic ---
+        const rawArray = [3, 1, 4, 2, 5];
+        let prefixBuilt = false;
+        const prefixResult = [];
+
+        function buildPrefix() {
+            let sum = 0;
+            const btn = document.getElementById('buildBtn');
+            btn.innerText = "Building...";
+            btn.disabled = true;
+            btn.classList.replace('bg-blue-600', 'bg-blue-400');
+            
+            document.querySelectorAll('.array-cell').forEach(el => {
+                el.className = "w-10 h-10 flex items-center justify-center bg-slate-100 border-2 border-slate-200 font-bold rounded text-slate-400 array-cell";
+                el.innerText = "?";
+            });
+            document.getElementById('querySection').classList.add('hidden');
+            document.getElementById('queryResult').classList.add('hidden');
+
+            const delay = 400;
+            
+            for(let i=0; i<rawArray.length; i++) {
+                setTimeout(() => {
+                    sum += rawArray[i];
+                    prefixResult[i] = sum;
+                    const cell = document.getElementById('p' + i);
+                    cell.innerText = sum;
+                    cell.classList.replace('bg-slate-100', 'bg-blue-50');
+                    cell.classList.replace('text-slate-400', 'text-blue-700');
+                    cell.classList.replace('border-slate-200', 'border-blue-300');
+                    cell.classList.add('scale-110');
+                    
+                    setTimeout(() => cell.classList.remove('scale-110'), 200);
+
+                    if(i === rawArray.length - 1) {
+                        prefixBuilt = true;
+                        btn.innerText = "Built!";
+                        btn.classList.replace('bg-blue-400', 'bg-slate-300');
+                        btn.classList.replace('text-white', 'text-slate-600');
+                        document.getElementById('querySection').classList.remove('hidden');
+                    }
+                }, i * delay);
+            }
+        }
+
+        function executeQuery() {
+            if(!prefixBuilt) return;
+            
+            document.querySelectorAll('.array-cell').forEach(el => {
+                el.classList.remove('highlight-calc', 'highlight-result');
+            });
+            
+            const l = parseInt(document.getElementById('qL').value);
+            const r = parseInt(document.getElementById('qR').value);
+            const resDiv = document.getElementById('queryResult');
+            
+            if(isNaN(l) || isNaN(r) || l > r || l < 0 || r > 4) {
+                resDiv.innerHTML = `<span class="text-rose-600">Error: L must be &le; R and within 0-4.</span>`;
+                resDiv.classList.remove('hidden');
+                return;
             }
 
-            card.innerHTML = `
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-3">
-                    <h3 class="font-bold text-lg text-slate-800">${item.title}</h3>
-                    <span class="text-xs font-bold uppercase tracking-wide bg-slate-100 text-slate-600 px-3 py-1 rounded mt-2 sm:mt-0 w-max">${item.cat}</span>
-                </div>
-                <p class="text-slate-600 text-sm mb-4">${item.desc}</p>
-                <div class="bg-indigo-50 border border-indigo-100 rounded p-4">
-                    <h4 class="text-xs font-bold text-indigo-800 uppercase tracking-widest mb-2">Architectural Logic</h4>
-                    ${aps}
-                </div>
-            `;
-            container.appendChild(card);
-        });
+            const rCell = document.getElementById('p' + r);
+            rCell.classList.add('highlight-calc');
+            
+            let valR = prefixResult[r];
+            let valL = 0;
+            let equation = `sum(${l}, ${r}) = prefix[${r}]`;
 
+            if(l > 0) {
+                const lCell = document.getElementById('p' + (l-1));
+                lCell.classList.add('highlight-calc');
+                valL = prefixResult[l-1];
+                equation += ` - prefix[${l-1}]<br>`;
+                equation += `sum(${l}, ${r}) = <span class="bg-yellow-100 px-1 rounded">${valR}</span> - <span class="bg-yellow-100 px-1 rounded">${valL}</span>`;
+            } else {
+                equation += `<br>sum(${l}, ${r}) = <span class="bg-yellow-100 px-1 rounded">${valR}</span>`;
+            }
+
+            const finalSum = valR - valL;
+            equation += ` = <strong class="text-emerald-700 text-lg bg-emerald-100 px-2 py-0.5 rounded shadow-sm">${finalSum}</strong>`;
+
+            resDiv.innerHTML = equation;
+            resDiv.classList.remove('hidden');
+        }
+
+        function resetVisualizer() {
+            prefixBuilt = false;
+            document.querySelectorAll('.array-cell').forEach(el => {
+                el.className = "w-10 h-10 flex items-center justify-center bg-slate-100 border-2 border-slate-200 font-bold rounded text-slate-400 array-cell";
+                el.innerText = "?";
+            });
+            const btn = document.getElementById('buildBtn');
+            btn.disabled = false;
+            btn.innerText = "1. Build Prefix Array";
+            btn.className = "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md";
+            document.getElementById('querySection').classList.add('hidden');
+            document.getElementById('queryResult').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>

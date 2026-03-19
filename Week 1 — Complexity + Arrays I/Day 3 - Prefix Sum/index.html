@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 3: Prefix Sum (Cumulative Data Processing)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chosen Palette: Slate & Indigo Minimalist (Professional, intellectual) -->
+    
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; scroll-behavior: smooth; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        .nav-active { background-color: #eef2ff; color: #4f46e5; border-right: 4px solid #4f46e5; font-weight: 600; }
+        pre { background-color: #0f172a; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        code { font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace; font-size: 0.875rem; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col h-full z-10 shadow-sm">
+        <div class="p-6 border-b border-slate-200">
+            <h1 class="text-xl font-bold text-slate-900 leading-tight">Prefix Sum</h1>
+            <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Day 3 &bull; Aggregation</p>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4 hide-scroll" id="sidebar-nav">
+            <button onclick="switchTab('block1')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors nav-active" data-target="block1">
+                &#128200; Block 1: The Paradigm
+            </button>
+            <button onclick="switchTab('block2')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block2">
+                &#128221; Block 2: Problem Set
+            </button>
+            <button onclick="switchTab('block3')" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors" data-target="block3">
+                &#128270; Block 3: The Hash Trick
+            </button>
+        </nav>
+        <div class="p-4 border-t border-slate-200 text-xs text-center text-slate-400">
+            Cumulative State Control
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto h-full bg-slate-50 relative pb-20">
+        <div class="max-w-5xl mx-auto px-8 py-12">
+            
+            <!-- BLOCK 1: ARCHITECTURE -->
+            <section id="block1" class="tab-content block">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900">Block 1: Architectural Design</h2>
+                    <p class="text-lg text-slate-600 mt-2">Transitioning from linear-time $O(n)$ sequence scanning to constant-time $O(1)$ query aggregation.</p>
+                </header>
+
+                <div class="space-y-12">
+                    <!-- Formulas -->
+                    <div>
+                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">1. Inclusion-Exclusion Formulas</h3>
+                        
+                        <div class="grid grid-cols-1 gap-6">
+                            <div class="bg-indigo-900 p-6 rounded-xl shadow-sm text-white font-mono text-center text-xl mb-4 tracking-wider">
+                                Sum(L, R) = P[R] - P[L-1]
+                            </div>
+                            <p class="text-slate-700 bg-white border border-slate-200 p-6 rounded-lg shadow-sm text-sm">
+                                Precompute cumulative totals so that the internal dependencies of a sequence are mathematically resolved. Any arbitrary segment is isolated and evaluated through strict algebraic subtraction of unwanted prefixes.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Scan Generalizations -->
+                    <div>
+                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">2. Scan Operator Inverses</h3>
+                        <p class="text-slate-700 mb-4">Any associative operator with an <strong class="text-indigo-600">inverse</strong> allows for O(1) range queries.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded text-sm text-indigo-900 font-mono text-center">
+                                a &oplus; b &rarr; P[R] &oplus; P[L-1]<br>
+                                <span class="text-xs text-indigo-500 block mt-1">(XOR is its own inverse)</span>
+                            </div>
+                            <div class="bg-red-50 border border-red-100 p-4 rounded text-sm text-red-900 font-mono text-center opacity-70">
+                                max(L, R) &rarr; <span class="line-through">P[R] - P[L-1]</span><br>
+                                <span class="text-xs text-red-500 block mt-1">(Max has no inverse!)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2D Extension -->
+                    <div>
+                        <h3 class="text-2xl font-bold border-b pb-2 mb-4 text-slate-800">3. Spatial Scaling (2D Matrix sums)</h3>
+                        <p class="text-sm text-slate-600 mb-4 bg-white border border-slate-200 p-6 rounded-xl shadow-sm">
+                            <strong class="text-indigo-800 block text-base mb-2">The 2D Formula:</strong>
+                            <code>Sum(r1, c1, r2, c2) = P[r2][c2] - P[r1-1][c2] - P[r2][c1-1] + P[r1-1][c1-1]</code>
+                            <br><br>
+                            This technique (The Integral Image) powers early real-time Computer Vision like Haar-Cascade face detection (Viola-Jones).
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- BLOCK 2: PROBLEMS -->
+            <section id="block2" class="tab-content hidden">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900">Block 2: Core Prefix Patterns (11 Variants)</h2>
+                    <p class="text-lg text-slate-600 mt-2">Segregated problem mechanics. Test your pattern mapping.</p>
+                </header>
+
+                <div id="snippet-container" class="grid grid-cols-1 gap-6">
+                    <!-- Snippets injected by JS -->
+                </div>
+            </section>
+
+            <!-- BLOCK 3: HASH TRICK -->
+            <section id="block3" class="tab-content hidden">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900">Block 3: The Map Trick ($O(N^2) \rightarrow O(N)$)</h2>
+                    <p class="text-lg text-slate-600 mt-2">Combining cumulative parity and hashing.</p>
+                </header>
+
+                <div class="mb-12">
+                    <div class="bg-indigo-900 text-indigo-200 p-8 rounded-xl border border-indigo-800 shadow-sm">
+                         <h3 class="text-2xl font-bold mb-4 text-white font-mono">P[i] - P[j] = K</h3>
+                         <p class="text-base text-indigo-300 leading-relaxed mb-6">
+                             When scanning an array looking for a dynamic condition $K$ (e.g. subarray sum equals K), we mathematically transform the request from a 2-pointer sliding window into a <strong>historic lookup</strong>. 
+                         </p>
+                         <div class="bg-white/10 p-4 rounded font-mono text-sm text-indigo-100">
+                             Since: P[i] - P[j] = K<br>
+                             Then: P[j] = P[i] - K
+                         </div>
+                         <p class="text-sm text-indigo-300 mt-6">
+                            As you iterate and generate $P[i]$, you simultaneously query a Hash Map for the existence of $P[i] - K$. If found, you immediately know a subarray exists ending at your current index.
+                         </p>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden bg-white rounded-xl shadow-sm border border-slate-200">
+                    <table class="min-w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-800 uppercase text-xs font-bold font-mono">
+                            <tr>
+                                <th class="px-6 py-4">Problem Goal</th>
+                                <th class="px-6 py-4">Hash Key</th>
+                                <th class="px-6 py-4">Hash Value</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-mono text-xs">
+                            <tr>
+                                <td class="px-6 py-4 bg-indigo-50/30">Exact Sum == K</td>
+                                <td class="px-6 py-4 text-indigo-600 font-bold">prefix_sum</td>
+                                <td class="px-6 py-4">Frequency count</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 bg-indigo-50/30">Max Length for Sum K</td>
+                                <td class="px-6 py-4 text-indigo-600 font-bold">prefix_sum</td>
+                                <td class="px-6 py-4">Earliest index seen (DO NOT update)</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 bg-indigo-50/30">Divisible by K</td>
+                                <td class="px-6 py-4 text-indigo-600 font-bold">prefix_sum % K</td>
+                                <td class="px-6 py-4">Earliest index seen</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 bg-indigo-50/30">Equal 0s and 1s</td>
+                                <td class="px-6 py-4 text-indigo-600 font-bold">Count(1) - Count(0)</td>
+                                <td class="px-6 py-4">Earliest index seen</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+            
+        </div>
+    </main>
+
+    <!-- JS Logic -->
+    <script>
+        // --- Navigation Logic ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('nav-active'));
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelector(`[data-target="${tabId}"]`).classList.add('nav-active');
+        }
+
+        // --- Block 2: 11 Problems Data ---
+        const problems = [
+            { 
+              title: "1. Range Sum Query - Immutable", cat: "Static Optimization",
+              desc: "Given multiple (L, R) range queries, optimize them to O(1).",
+              ap1: "Build array P of size N+1 where P[i+1] = P[i] + val[i].",
+              ap2: "Return `P[right + 1] - P[left]`."
+            },
+            { 
+              title: "2. Running Sum of 1D Array", cat: "Idempotent State",
+              desc: "Return the cumulative running sum.",
+              ap1: "Mutate array in-place. `nums[i] += nums[i-1]`.",
+              ap2: ""
+            },
+            { 
+              title: "3. Subarray Sum Equals K", cat: "HashMap + Prefix",
+              desc: "Count subarrays that sum exactly to target k. Numbers can be negative.",
+              ap1: "P[j] = P[i] - k. Hash `{running_sum: frequency}`.",
+              ap2: "Add hash_map[sum - k] to your answer counter on each step."
+            },
+            { 
+              title: "4. Continuous Subarray Sum", cat: "Modular Math",
+              desc: "Find if any subarray length >= 2 sums to a multiple of k.",
+              ap1: "Hash `{ (sum % k) : earliest_index }`. If same mod seen at distance >= 2, return true.",
+              ap2: "C++ requires manual correction for negative modulo values: `if (rem < 0) rem += k;`"
+            },
+            { 
+              title: "5. Max Size Subarray Sum Equals K", cat: "HashMap Edge Cases",
+              desc: "Find maximum width of a subarray summing to k.",
+              ap1: "Hash `{running_sum: earliest_index}`.",
+              ap2: "TRAP: Only insert key if it does NOT exist. If you overwrite the index, you shrink lengths."
+            },
+            { 
+              title: "6. Binary Subarrays With Sum", cat: "Scaling Math / AtMost Trick",
+              desc: "Given array of 1s and 0s, count subarrays summing to goal.",
+              ap1: "Hash map works universally. Alternatively, use O(1) space AtMost sliding window strategy.",
+              ap2: "Return `AtMost(goal) - AtMost(goal - 1)`."
+            },
+            { 
+              title: "7. Contiguous Array", cat: "Parity Equilibrium",
+              desc: "Max length subarray with equal 1s and 0s.",
+              ap1: "Treat 0 as -1. Treat 1 as +1. Problem simplifies to 'Find max length subarray summing to 0'.",
+              ap2: "Use Prefix HashMap tracking `0` offset."
+            },
+            { 
+              title: "8. Submatrices That Sum to Target", cat: "2D Compression",
+              desc: "Scale 2D arrays to 1D prefix queries.",
+              ap1: "Fix `top_row` and `bottom_row`. Compress the matrix heights into a 1D column sums array.",
+              ap2: "Run standard 1D 'Subarray sum equals K' across columns. O(R^2 * C)"
+            },
+            { 
+              title: "9. Max Average Subarray II", cat: "Binary Search + Bounds",
+              desc: "Find the max average of a contiguous array of length >= k.",
+              ap1: "Binary search the average boundary. Subtract the 'candidate_avg' from all elements.",
+              ap2: "If any prefix_sum minus the (min_prefix seen at least K steps ago) >= 0, the avg is possible!"
+            },
+            { 
+              title: "10. Corporate Flight Bookings", cat: "1D Difference Array",
+              desc: "Process offline point-range updates rapidly.",
+              ap1: "D[first] += seats. D[last+1] -= seats.",
+              ap2: "Compute prefix sum of D to reconstruct the static array."
+            },
+            { 
+              title: "11. Car Pooling", cat: "Sweep Line",
+              desc: "Can car pick up passengers effectively?",
+              ap1: "Similar to Difference Array indexing: D[pickup] += P; D[dropoff] -= P.",
+              ap2: "If running sum ever exceeds capacity, return false."
+            }
+        ];
+
+        const container = document.getElementById('snippet-container');
+        problems.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = "bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden p-6";
+            
+            let aps = `<p class="text-indigo-700 text-sm mt-2 font-mono pb-1 border-b border-indigo-100">${item.ap1}</p>`;
+            if (item.ap2) {
+                 aps += `<p class="text-indigo-700 text-sm mt-1 font-mono">${item.ap2}</p>`;
+            }
+
+            card.innerHTML = `
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-3">
+                    <h3 class="font-bold text-lg text-slate-800">${item.title}</h3>
+                    <span class="text-xs font-bold uppercase tracking-wide bg-slate-100 text-slate-600 px-3 py-1 rounded mt-2 sm:mt-0 w-max">${item.cat}</span>
+                </div>
+                <p class="text-slate-600 text-sm mb-4">${item.desc}</p>
+                <div class="bg-indigo-50 border border-indigo-100 rounded p-4">
+                    <h4 class="text-xs font-bold text-indigo-800 uppercase tracking-widest mb-2">Architectural Logic</h4>
+                    ${aps}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+    </script>
+</body>
+</html>
